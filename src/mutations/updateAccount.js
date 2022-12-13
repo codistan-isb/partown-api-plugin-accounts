@@ -43,6 +43,16 @@ const inputSchema = new SimpleSchema({
   username: {
     type: String,
     optional: true
+  },
+  dob: {
+    type: String,
+    label:"dob",
+    optional: true
+  },
+  phone: {
+    label:"phone",
+    type: String,
+    optional: true
   }
 });
 
@@ -61,8 +71,7 @@ const inputSchema = new SimpleSchema({
  * @returns {Promise<Object>} Updated account document
  */
 export default async function updateAccount(context, input) {
-
-  // inputSchema.validate(input);
+  inputSchema.validate(input);
   const { appEvents, collections, accountId: accountIdFromContext, userId } = context;
   const { Accounts } = collections;
   const {
@@ -75,9 +84,9 @@ export default async function updateAccount(context, input) {
     name,
     note,
     picture,
-    username
+    username,dob,phone
   } = input;
-  console.log("update account called", input)
+
   const accountId = providedAccountId || accountIdFromContext;
   if (!accountId) throw new ReactionError("access-denied", "Access Denied");
 
@@ -144,6 +153,19 @@ export default async function updateAccount(context, input) {
     updatedFields.push("username");
   }
 
+  
+  if (typeof dob === "string" || dob === null) {
+    // For some reason we store name in two places. Should fix eventually.
+    updates.dob = dob;
+    updates["profile.dob"] = dob;
+    updatedFields.push("dob");
+  }
+  if (typeof phone === "string" || phone === null) {
+    // For some reason we store name in two places. Should fix eventually.
+    updates.phone = phone;
+    updates["phone"] = phone;
+    updatedFields.push("phone");
+  }
   if (updatedFields.length === 0) {
     throw new ReactionError("invalid-argument", "At least one field to update is required");
   }
