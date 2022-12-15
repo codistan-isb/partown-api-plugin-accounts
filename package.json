@@ -1,11 +1,11 @@
 {
   "name": "@blackspider1994/api-plugin-accounts",
   "description": "Accounts plugin for the Reaction API",
-  "version": "2.0.2",
+  "version": "2.0.2-development",
   "main": "index.js",
   "type": "module",
   "engines": {
-    "node": ">=12.14.1"
+    "node": ">=14.18.1"
   },
   "homepage": "https://github.com/blackspider1994/api-plugin-accounts",
   "url": "https://github.com/blackspider1994/api-plugin-accounts",

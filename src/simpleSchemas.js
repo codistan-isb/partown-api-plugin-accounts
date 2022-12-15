@@ -209,6 +209,15 @@ export const Profile = new SimpleSchema({
   "lastName": {
     type: String,
     optional: true
+  }, dob: {
+    type: String,
+    label: "dob",
+    optional: true
+  },
+  phone: {
+    label: "phone",
+    type: String,
+    optional: true
   },
   "invited": {
     type: Boolean,
@@ -275,6 +284,26 @@ export const Email = new SimpleSchema({
   }
 });
 
+
+export const contactInfo = new SimpleSchema({
+  email: String,
+  phone: String,
+  Address1: String,
+  Address2: { type: String, optional: true, label: "Address2" },
+  Address3: { type: String, optional: true, label: "Address3" },
+  country: String,
+  postcode: String
+});
+
+
+export const nextKin = new SimpleSchema({
+  name: String,
+  address: String,
+  phone: String,
+  email: String,
+  gender: String,
+  relation: String
+})
 /**
  * @name Account
  * @memberof Schemas
@@ -305,6 +334,7 @@ export const Account = new SimpleSchema({
   "sessions.$": {
     type: String
   },
+
   "shopId": {
     type: String,
     optional: true
@@ -346,6 +376,16 @@ export const Account = new SimpleSchema({
     type: Profile,
     optional: true
   },
+  dob: {
+    type: String,
+    label: "dob",
+    optional: true
+  },
+  phone: {
+    label: "phone",
+    type: String,
+    optional: true
+  },
   "groups": {
     type: Array, // groupIds that user belongs to
     optional: true,
@@ -367,7 +407,14 @@ export const Account = new SimpleSchema({
   "updatedAt": {
     type: Date,
     optional: true
-  }
+  },
+  "nextKin": {
+    type: nextKin,
+    optional: true
+
+  },
+
+  "contactInfo": { type: contactInfo, optional: true }
 });
 
 /**

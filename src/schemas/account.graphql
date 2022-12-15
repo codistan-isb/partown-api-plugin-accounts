@@ -131,6 +131,18 @@ input UpdateAccountInput {
 
   "Username"
   username: String
+  
+  "date of birth"
+  dob: String
+  
+  "phone number"
+  phone: String
+
+  "Next of kin information"
+  nextKin:NextKinInput
+
+  "User contact information"
+  contactInfo:contactInfoInput
 }
 
 "Defines a new Email and the account to which it should be added"
@@ -255,6 +267,63 @@ type Account implements Node {
 
   "Username"
   username: String
+
+  nextKin:NextKin
+
+  "User Phone Nymbers"
+  phone:String
+  
+  "User Date of Birth"
+  dob:String
+  contactInfo:contactInfo
+}
+enum Gender{
+  Male
+  Female  
+  Other
+}
+
+enum KinRelation{
+  Mother
+  Father  
+  Brother
+  Sister
+}
+type NextKin {
+  name:String
+  address: String
+  phone: String
+  email : String
+  gender :Gender
+  relation: KinRelation
+}
+input NextKinInput {
+  name:String!
+  address: String!
+  phone: String!
+  email : String!
+  gender :Gender!
+  relation: KinRelation!
+}
+
+input contactInfoInput {
+  email:String!
+  phone:String!
+  Address1:String!
+  Address2:String
+  Address3:String
+  country:String!
+  postcode:String!
+}
+type contactInfo {
+  
+  email:String
+  phone:String
+  Address1:String
+  Address2:String
+  Address3:String
+  country:String
+  postcode:String
 }
 
 "Represents a single user partial account"

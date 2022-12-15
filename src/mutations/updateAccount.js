@@ -3,6 +3,25 @@ import ReactionError from "@reactioncommerce/reaction-error";
 import CurrencyDefinitions from "@reactioncommerce/api-utils/CurrencyDefinitions.js";
 import { Account } from "../simpleSchemas.js";
 
+ const nextKin = new SimpleSchema({
+  name: String,
+  address: String,
+  phone: String,
+  email: String,
+  gender: String,
+  relation: String
+})
+
+ const contactInfo = new SimpleSchema({
+  email: String,
+  phone: String,
+  Address1: String,
+  Address2: { type: String, optional: true,label:"Address2" },
+  Address3: { type: String, optional: true ,label:"Address3"},
+  country: String,
+  postcode: String
+});
+
 const inputSchema = new SimpleSchema({
   accountId: {
     type: String,
@@ -46,14 +65,25 @@ const inputSchema = new SimpleSchema({
   },
   dob: {
     type: String,
-    label:"dob",
+    label: "dob",
     optional: true
   },
   phone: {
-    label:"phone",
+    label: "phone",
     type: String,
     optional: true
+  },
+  nextKin: {
+    label: "nextKin",
+    type: nextKin,
+    optional: true
+  },
+  contactInfo: {
+    label: "contactInfo",
+    type: contactInfo,
+    optional: true
   }
+
 });
 
 /**
@@ -84,7 +114,7 @@ export default async function updateAccount(context, input) {
     name,
     note,
     picture,
-    username,dob,phone
+    username, dob, phone, nextKin,contactInfo
   } = input;
 
   const accountId = providedAccountId || accountIdFromContext;
@@ -153,7 +183,7 @@ export default async function updateAccount(context, input) {
     updatedFields.push("username");
   }
 
-  
+
   if (typeof dob === "string" || dob === null) {
     // For some reason we store name in two places. Should fix eventually.
     updates.dob = dob;
@@ -166,6 +196,20 @@ export default async function updateAccount(context, input) {
     updates["phone"] = phone;
     updatedFields.push("phone");
   }
+  if (typeof nextKin === "object" || nextKin === null) {
+    // For some reason we store name in two places. Should fix eventually.
+    updates.nextKin = nextKin;
+    updates["nextKin"] = nextKin;
+    updatedFields.push("nextKin");
+  }
+  console.log("contactInfo",contactInfo);
+  if (typeof contactInfo === "object" || contactInfo === null) {
+    // For some reason we store name in two places. Should fix eventually.
+    updates.contactInfo = contactInfo;
+    updates["contactInfo"] = contactInfo;
+    updatedFields.push("contactInfo");
+  }
+
   if (updatedFields.length === 0) {
     throw new ReactionError("invalid-argument", "At least one field to update is required");
   }
@@ -176,7 +220,6 @@ export default async function updateAccount(context, input) {
       updatedAt: new Date()
     }
   };
-
   Account.validate(modifier, { modifier: true });
 
   const { value: updatedAccount } = await Accounts.findOneAndUpdate({
