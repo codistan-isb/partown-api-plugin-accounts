@@ -145,6 +145,11 @@ input UpdateAccountInput {
   contactInfo:contactInfoInput
 }
 
+type wallet {
+  currency: String
+  amount: Int
+}
+
 "Defines a new Email and the account to which it should be added"
 input AddAccountEmailRecordInput {
   "The account ID, which defaults to the viewer account"
@@ -272,6 +277,9 @@ type Account implements Node {
 
   "User Phone Nymbers"
   phone:String
+
+  "user wallet"
+  wallet: wallet
   
   "User Date of Birth"
   dob:String
@@ -496,7 +504,26 @@ type UpdateGroupsForAccountsPayload {
   accounts: [Account]!
 }
 
+input walletInfo {
+  currency: String
+  amount: Int
+}
+
+input walletInput{
+  userId: String
+  wallet: walletInfo
+}
+
+
+type userWallet{
+  success: Boolean
+  status: Int
+  message: String
+}
+
 extend type Mutation {
+  "add wallet for user"
+  addUserWallet(input: walletInput): userWallet
   "Add a new address to the `addressBook` field for an account"
   addAccountAddressBookEntry(
     "Mutation input"

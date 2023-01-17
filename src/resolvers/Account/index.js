@@ -18,6 +18,7 @@ export default {
   nextKin: (account) => account.nextKin,
   lastName: (account) => account.profile.lastName,
   phone: (account) => account.profile.phone,
+  wallet: (account) => account.wallets ?? 0,
   dob: (account) => account.profile.dob,
   language: (account) => account.profile.language,
   name: (account) => account.profile.name || account.name,

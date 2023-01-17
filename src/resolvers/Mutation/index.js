@@ -37,5 +37,42 @@ export default {
   updateAccountAddressBookEntry,
   updateAccountGroup,
   updateAdminUIAccess,
-  updateGroupsForAccounts
+  updateGroupsForAccounts,
+  async addUserWallet(parent, args, context, info) {
+    try {
+      let { Accounts } = context.collections;
+      let { user } = context;
+      let { userId, wallet } = args.input
+      if( user ){
+
+        let wallets = await Accounts.updateOne(
+          { userId }, 
+          { 
+            $inc: { "wallets.amount": wallet.amount },
+            $set: { "wallets.currency": wallet.currency }
+          }
+        )
+        console.log("walletInput", userId, wallet.currency, wallet.amount)
+        return {
+          // wallets,
+          status: 200,
+          success: true,
+          message: `data found.`
+        }
+      } else {
+        return {
+          success: false,
+          message: `unAuthorized.`,
+          status: 401
+        }
+      }
+    } catch(err) {
+      console.log("Error", err);
+      return {
+        success: false,
+        message: `Server Error ${err}.`,
+        status: 500
+      }
+    }
+  }
 };

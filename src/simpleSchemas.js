@@ -324,6 +324,15 @@ export const nextKin = new SimpleSchema({
  * @property {Date} createdAt required
  * @property {Date} updatedAt optional
  */
+
+const wallet = new SimpleSchema({
+  currency: {
+    type: String
+  },
+  amount: {
+    type: Number
+  }
+})
 export const Account = new SimpleSchema({
   "_id": String,
   "userId": String,
@@ -386,6 +395,7 @@ export const Account = new SimpleSchema({
     type: String,
     optional: true
   },
+  wallet: wallet,
   "groups": {
     type: Array, // groupIds that user belongs to
     optional: true,

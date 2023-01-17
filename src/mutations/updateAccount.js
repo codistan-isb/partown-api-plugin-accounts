@@ -196,6 +196,7 @@ export default async function updateAccount(context, input) {
     updates["phone"] = phone;
     updatedFields.push("phone");
   }
+ 
   if (typeof nextKin === "object" || nextKin === null) {
     // For some reason we store name in two places. Should fix eventually.
     updates.nextKin = nextKin;
