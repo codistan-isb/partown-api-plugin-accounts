@@ -138,12 +138,26 @@ input UpdateAccountInput {
   "phone number"
   phone: String
 
+  govId: [govIdInput]
+  poAddress: [String]    
+
   "Next of kin information"
   nextKin:NextKinInput
 
   "User contact information"
   contactInfo:contactInfoInput
 }
+
+input govIdInput {
+  key: String
+  value: String
+}
+
+type govId{
+  key: String
+  value: String
+}
+
 
 type wallet {
   currency: String
@@ -281,6 +295,12 @@ type Account implements Node {
   "user wallet"
   wallet: wallet
   
+  "user gov id"
+  govId: [govId]
+
+  "user proof of address"
+  poAddress: [String]  
+
   "User Date of Birth"
   dob:String
   contactInfo:contactInfo

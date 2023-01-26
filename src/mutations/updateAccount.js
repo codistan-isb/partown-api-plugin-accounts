@@ -21,6 +21,21 @@ import { Account } from "../simpleSchemas.js";
   country: String,
   postcode: String
 });
+const govId = new SimpleSchema({
+  key: {
+    type: String,
+    optional: true
+  },
+  value: {
+    type: String,
+    optional: true
+  }
+})
+
+const poAddress = new SimpleSchema({
+  type: String,
+  optional: true
+})
 
 const inputSchema = new SimpleSchema({
   accountId: {
@@ -73,6 +88,11 @@ const inputSchema = new SimpleSchema({
     type: String,
     optional: true
   },
+  govId: [govId],
+  poAddress: [{
+    type: String,
+    optional: true
+  }],
   nextKin: {
     label: "nextKin",
     type: nextKin,
@@ -103,7 +123,7 @@ const inputSchema = new SimpleSchema({
 export default async function updateAccount(context, input) {
   inputSchema.validate(input);
   const { appEvents, collections, accountId: accountIdFromContext, userId } = context;
-  const { Accounts } = collections;
+  const { Accounts, users } = collections;
   const {
     accountId: providedAccountId,
     bio,
@@ -114,7 +134,7 @@ export default async function updateAccount(context, input) {
     name,
     note,
     picture,
-    username, dob, phone, nextKin,contactInfo
+    username, dob, phone, nextKin,contactInfo, govId, poAddress
   } = input;
 
   const accountId = providedAccountId || accountIdFromContext;
@@ -210,7 +230,17 @@ export default async function updateAccount(context, input) {
     updates["contactInfo"] = contactInfo;
     updatedFields.push("contactInfo");
   }
-
+  if (govId) {
+    // For some reason we store name in two places. Should fix eventually.
+    updates.govId = govId;
+    updates["govId"] = govId;
+    updatedFields.push("govId");
+  }
+  if (poAddress) {
+    // For some reason we store name in two places. Should fix eventually.
+    updates.poAddress = poAddress ?? "null";
+    updates["poAddress"] = poAddress ?? "null";
+  }
   if (updatedFields.length === 0) {
     throw new ReactionError("invalid-argument", "At least one field to update is required");
   }
@@ -228,7 +258,7 @@ export default async function updateAccount(context, input) {
   }, modifier, {
     returnOriginal: false
   });
-
+  await users.update({ _id: accountId }, { $set: { firstName, lastName } })
   await appEvents.emit("afterAccountUpdate", {
     account: updatedAccount,
     updatedBy: userId,
