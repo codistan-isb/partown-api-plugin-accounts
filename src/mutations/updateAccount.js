@@ -33,10 +33,20 @@ const govId = new SimpleSchema({
 })
 
 const poAddress = new SimpleSchema({
-  type: String,
-  optional: true
-})
+  address: {
+    type: String,
+    optional: true
+  },
+  type: {
+    type: String,
+    optional: true
+  },
+  document: {
+    type: String,
+    optional: true
+  }
 
+})
 const inputSchema = new SimpleSchema({
   accountId: {
     type: String,
@@ -89,10 +99,7 @@ const inputSchema = new SimpleSchema({
     optional: true
   },
   govId: [govId],
-  poAddress: [{
-    type: String,
-    optional: true
-  }],
+  poAddress: [poAddress],
   nextKin: {
     label: "nextKin",
     type: nextKin,

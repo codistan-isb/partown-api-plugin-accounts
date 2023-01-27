@@ -137,15 +137,22 @@ input UpdateAccountInput {
   
   "phone number"
   phone: String
-
+  
   govId: [govIdInput]
-  poAddress: [String]    
+  poAddress: [poAddressInput]    
 
   "Next of kin information"
   nextKin:NextKinInput
 
   "User contact information"
   contactInfo:contactInfoInput
+}
+
+
+input poAddressInput {
+  address: String
+  type: String
+  document: String
 }
 
 input govIdInput {
@@ -156,6 +163,12 @@ input govIdInput {
 type govId{
   key: String
   value: String
+}
+
+type poAddress {
+  address: String
+  type: String
+  document: String
 }
 
 
@@ -299,7 +312,7 @@ type Account implements Node {
   govId: [govId]
 
   "user proof of address"
-  poAddress: [String]  
+  poAddress: [poAddress]  
 
   "User Date of Birth"
   dob:String

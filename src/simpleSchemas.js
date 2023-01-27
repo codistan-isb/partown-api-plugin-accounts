@@ -349,8 +349,19 @@ const govId = new SimpleSchema({
 })
 
 const poAddress = new SimpleSchema({
-  type: String,
-  optional: true
+  address: {
+    type: String,
+    optional: true
+  },
+  type: {
+    type: String,
+    optional: true
+  },
+  document: {
+    type: String,
+    optional: true
+  }
+
 })
 export const Account = new SimpleSchema({
   "_id": String,
@@ -420,10 +431,7 @@ export const Account = new SimpleSchema({
     optional: true
   },
   govId: [govId],
-  poAddress: [{
-    type: String,
-    optional: true
-  }],
+  poAddress: [poAddress],
   "groups": {
     type: Array, // groupIds that user belongs to
     optional: true,
