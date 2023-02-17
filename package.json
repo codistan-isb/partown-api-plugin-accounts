@@ -1,5 +1,5 @@
 {
-  "name": "@blackspider1994/api-plugin-accounts",
+  "name": "@partown/api-plugin-accounts",
   "description": "Accounts plugin for the Reaction API",
   "version": "5.0.4-development",
   "main": "index.js",
@@ -7,12 +7,12 @@
   "engines": {
     "node": ">=14.18.1"
   },
-  "homepage": "https://github.com/blackspider1994/api-plugin-accounts",
-  "url": "https://github.com/blackspider1994/api-plugin-accounts",
+  "homepage": "https://github.com/irtaza780/api-plugin-accounts",
+  "url": "https://github.com/irtaza780/api-plugin-accounts",
   "email": "hello-open-commerce@mailchimp.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blackspider1994/api-plugin-accounts.git"
+    "url": "git+https://github.com/irtaza780/api-plugin-accounts.git"
   },
   "author": {
     "name": "Reaction Commerce",
@@ -21,7 +21,7 @@
   },
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/blackspider1994/api-plugin-accounts/issues"
+    "url": "https://github.com/irtaza780/api-plugin-accounts/issues"
   },
   "sideEffects": false,
   "dependencies": {
