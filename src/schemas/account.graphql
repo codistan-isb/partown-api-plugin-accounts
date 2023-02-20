@@ -131,23 +131,22 @@ input UpdateAccountInput {
 
   "Username"
   username: String
-  
+
   "date of birth"
   dob: String
-  
+
   "phone number"
   phone: String
-  
+
   govId: [govIdInput]
-  poAddress: [poAddressInput]    
+  poAddress: [poAddressInput]
 
   "Next of kin information"
-  nextKin:NextKinInput
+  nextKin: NextKinInput
 
   "User contact information"
-  contactInfo:contactInfoInput
+  contactInfo: contactInfoInput
 }
-
 
 input poAddressInput {
   address: String
@@ -160,7 +159,7 @@ input govIdInput {
   value: String
 }
 
-type govId{
+type govId {
   key: String
   value: String
 }
@@ -171,13 +170,12 @@ type poAddress {
   document: String
 }
 
-
 type wallet {
   currency: String
   amount: Int
 }
 
-"Defines a new Email and the account to which it should be added"
+"Defines a new Email and the account to which it should be added (1)"
 input AddAccountEmailRecordInput {
   "The account ID, which defaults to the viewer account"
   accountId: ID
@@ -232,16 +230,16 @@ type Account implements Node {
   "A list of physical or mailing addresses associated with this account"
   addressBook(
     "Return only results that come after this cursor. Use this with `first` to specify the number of results to return."
-    after: ConnectionCursor,
+    after: ConnectionCursor
 
     "Return only results that come before this cursor. Use this with `last` to specify the number of results to return."
-    before: ConnectionCursor,
+    before: ConnectionCursor
 
     "Return at most this many results. This parameter may be used with either `after` or `offset` parameters."
-    first: ConnectionLimitInt,
+    first: ConnectionLimitInt
 
     "Return at most this many results. This parameter may be used with the `before` parameter."
-    last: ConnectionLimitInt,
+    last: ConnectionLimitInt
 
     "Return only results that come after the Nth result. This parameter may be used with the `first` parameter."
     offset: Int
@@ -300,71 +298,70 @@ type Account implements Node {
   "Username"
   username: String
 
-  nextKin:NextKin
+  nextKin: NextKin
 
   "User Phone Nymbers"
-  phone:String
+  phone: String
 
   "user wallet"
   wallet: wallet
-  
+
   "user gov id"
   govId: [govId]
 
   "user proof of address"
-  poAddress: [poAddress]  
+  poAddress: [poAddress]
 
   "User Date of Birth"
-  dob:String
-  contactInfo:contactInfo
+  dob: String
+  contactInfo: contactInfo
 }
-enum Gender{
+enum Gender {
   Male
-  Female  
+  Female
   Other
 }
 
-enum KinRelation{
+enum KinRelation {
   Mother
-  Father  
+  Father
   Brother
   Sister
 }
 type NextKin {
-  name:String
+  name: String
   address: String
   phone: String
-  email : String
-  gender :Gender
+  email: String
+  gender: Gender
   relation: KinRelation
 }
 input NextKinInput {
-  name:String!
+  name: String!
   address: String!
   phone: String!
-  email : String!
-  gender :Gender!
+  email: String!
+  gender: Gender!
   relation: KinRelation!
 }
 
 input contactInfoInput {
-  email:String!
-  phone:String!
-  Address1:String!
-  Address2:String
-  Address3:String
-  country:String!
-  postcode:String!
+  email: String!
+  phone: String!
+  Address1: String!
+  Address2: String
+  Address3: String
+  country: String!
+  postcode: String!
 }
 type contactInfo {
-  
-  email:String
-  phone:String
-  Address1:String
-  Address2:String
-  Address3:String
-  country:String
-  postcode:String
+  email: String
+  phone: String
+  Address1: String
+  Address2: String
+  Address3: String
+  country: String
+  postcode: String
 }
 
 "Represents a single user partial account"
@@ -404,7 +401,6 @@ type BasicAccount implements Node {
 
   "List of shop Ids"
   adminUIShopIds: [String]
-
 }
 
 type Profile {
@@ -542,13 +538,12 @@ input walletInfo {
   amount: Int
 }
 
-input walletInput{
+input walletInput {
   userId: String
-  wallet: walletInfo
+  wallet: walletInfo!
 }
 
-
-type userWallet{
+type userWallet {
   success: Boolean
   status: Int
   message: String
@@ -557,6 +552,13 @@ type userWallet{
 extend type Mutation {
   "add wallet for user"
   addUserWallet(input: walletInput): userWallet
+
+  "add/withdraw funds to and from user wallet"
+  updateUserFunds(input: walletInput!): userWallet
+
+  "withdraw funds from user wallet"
+  withdrawFundsFromUserWallet(amount: Float): userWallet
+
   "Add a new address to the `addressBook` field for an account"
   addAccountAddressBookEntry(
     "Mutation input"
@@ -620,36 +622,33 @@ extend type Mutation {
 
 extend type Query {
   "Returns the account with the provided ID"
-  account(
-    "The account ID"
-    id: ID!
-  ): Account
+  account("The account ID" id: ID!): Account
 
   "Returns accounts optionally filtered by account groups"
   accounts(
     "Return only accounts in any of these groups"
-    groupIds: [ID],
+    groupIds: [ID]
 
     "Return accounts that aren't in any groups"
-    notInAnyGroups: Boolean,
+    notInAnyGroups: Boolean
 
     "Return only results that come after this cursor. Use this with `first` to specify the number of results to return."
-    after: ConnectionCursor,
+    after: ConnectionCursor
 
     "Return only results that come before this cursor. Use this with `last` to specify the number of results to return."
-    before: ConnectionCursor,
+    before: ConnectionCursor
 
     "Return at most this many results. This parameter may be used with either `after` or `offset` parameters."
-    first: ConnectionLimitInt,
+    first: ConnectionLimitInt
 
     "Return at most this many results. This parameter may be used with the `before` parameter."
-    last: ConnectionLimitInt,
+    last: ConnectionLimitInt
 
     "Return only results that come after the Nth result. This parameter may be used with the `first` parameter."
-    offset: Int,
+    offset: Int
 
     "Return results sorted in this order"
-    sortOrder: SortOrder = asc,
+    sortOrder: SortOrder = asc
 
     "By default, groups are sorted by when they were created, oldest first. Set this to sort by one of the other allowed fields"
     sortBy: AccountSortByField = createdAt
@@ -658,22 +657,22 @@ extend type Query {
   "Returns customer accounts"
   customers(
     "Return only results that come after this cursor. Use this with `first` to specify the number of results to return."
-    after: ConnectionCursor,
+    after: ConnectionCursor
 
     "Return only results that come before this cursor. Use this with `last` to specify the number of results to return."
-    before: ConnectionCursor,
+    before: ConnectionCursor
 
     "Return at most this many results. This parameter may be used with either `after` or `offset` parameters."
-    first: ConnectionLimitInt,
+    first: ConnectionLimitInt
 
     "Return at most this many results. This parameter may be used with the `before` parameter."
-    last: ConnectionLimitInt,
+    last: ConnectionLimitInt
 
     "Return only results that come after the Nth result. This parameter may be used with the `first` parameter."
-    offset: Int,
+    offset: Int
 
     "Return results sorted in this order"
-    sortOrder: SortOrder = asc,
+    sortOrder: SortOrder = asc
 
     "By default, groups are sorted by when they were created, oldest first. Set this to sort by one of the other allowed fields"
     sortBy: AccountSortByField = createdAt

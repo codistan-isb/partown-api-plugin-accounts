@@ -42,37 +42,77 @@ export default {
     try {
       let { Accounts } = context.collections;
       let { user } = context;
-      let { userId, wallet } = args.input
-      if( user ){
-
+      let { userId, wallet } = args.input;
+      if (user) {
         let wallets = await Accounts.updateOne(
-          { userId }, 
-          { 
+          { userId },
+          {
             $inc: { "wallets.amount": wallet.amount },
-            $set: { "wallets.currency": wallet.currency }
+            $set: { "wallets.currency": wallet.currency },
           }
-        )
-        console.log("walletInput", userId, wallet.currency, wallet.amount)
+        );
+        console.log("walletInput", userId, wallet.currency, wallet.amount);
         return {
           // wallets,
           status: 200,
           success: true,
-          message: `data found.`
-        }
+          message: `data found.`,
+        };
       } else {
         return {
           success: false,
           message: `unAuthorized.`,
-          status: 401
-        }
+          status: 401,
+        };
       }
-    } catch(err) {
+    } catch (err) {
       console.log("Error", err);
       return {
         success: false,
         message: `Server Error ${err}.`,
-        status: 500
-      }
+        status: 500,
+      };
     }
-  }
+  },
+  async updateUserFunds(parent, args, context, info) {
+    try {
+      let { Accounts } = context.collections;
+      let { user } = context;
+      let { userId, wallet } = args.input;
+
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+          status: 200,
+        };
+      }
+      let accountInfo = await Accounts.find({ userId }).toArray();
+
+      const prevAmount = accountInfo[0].wallets.amount;
+      let newAmount = prevAmount + wallet.amount;
+      console.log("prevAmount is ", prevAmount);
+      console.log("new amount is ", newAmount);
+      const updatedWallet = await Accounts.updateOne(
+        { userId },
+        { $set: { "wallets.amount": newAmount } }
+      );
+      console.log("*****updated wallet result*****");
+      console.log(updatedWallet);
+      if (updatedWallet?.result?.n > 0) {
+        return {
+          success: true,
+          message: "wallet amount updated successfully",
+          status: 200,
+        };
+      }
+    } catch (err) {
+      console.log("Add Funds to Wallet Mutation", err);
+      return {
+        success: false,
+        message: `Server Error ${err}`,
+        status: 500,
+      };
+    }
+  },
 };
