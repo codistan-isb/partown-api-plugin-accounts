@@ -120,6 +120,9 @@ input UpdateAccountInput {
   "The last name of the person this account represents"
   lastName: String
 
+  "Suspension status of the person this account represents"
+  suspend: Boolean
+
   "The full name of the person this account represents"
   name: String
 
@@ -144,6 +147,8 @@ input UpdateAccountInput {
   "Next of kin information"
   nextKin: NextKinInput
 
+  "User Preferences Input"
+  userPreferences: userPreferencesInput
   "User contact information"
   contactInfo: contactInfoInput
 }
@@ -173,6 +178,11 @@ type poAddress {
 type wallet {
   currency: String
   amount: Int
+}
+
+type userPreferences {
+  contactPreferences: contactPreferences
+  alertsPreferences: [String]
 }
 
 "Defines a new Email and the account to which it should be added (1)"
@@ -269,6 +279,9 @@ type Account implements Node {
   "The last name of the person this account represents, if known"
   lastName: String
 
+  "Suspension status of the person this account represents"
+  suspend: Boolean
+
   "Arbitrary additional metadata about this account"
   metafields: [Metafield]
 
@@ -298,6 +311,7 @@ type Account implements Node {
   "Username"
   username: String
 
+  "Next of Kin"
   nextKin: NextKin
 
   "User Phone Nymbers"
@@ -305,6 +319,9 @@ type Account implements Node {
 
   "user wallet"
   wallet: wallet
+
+  "user preferences"
+  userPreferences: userPreferences
 
   "user gov id"
   govId: [govId]
@@ -328,6 +345,17 @@ enum KinRelation {
   Brother
   Sister
 }
+
+type contactPreferences {
+  email: Boolean
+  sms: Boolean
+}
+
+input contactPreferencesInput {
+  email: Boolean
+  sms: Boolean
+}
+
 type NextKin {
   name: String
   address: String
@@ -336,6 +364,7 @@ type NextKin {
   gender: Gender
   relation: KinRelation
 }
+
 input NextKinInput {
   name: String!
   address: String!
@@ -543,6 +572,11 @@ input walletInput {
   wallet: walletInfo!
 }
 
+input userPreferencesInput {
+  contactPreferences: contactPreferencesInput
+  alertsPreferences: [String]
+}
+
 type userWallet {
   success: Boolean
   status: Int
@@ -558,6 +592,9 @@ extend type Mutation {
 
   "withdraw funds from user wallet"
   withdrawFundsFromUserWallet(amount: Float): userWallet
+
+  "add suspension status for a user"
+  addSuspensionStatus(userId: String, suspend: Boolean): Boolean
 
   "Add a new address to the `addressBook` field for an account"
   addAccountAddressBookEntry(

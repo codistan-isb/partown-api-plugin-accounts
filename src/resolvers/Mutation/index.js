@@ -115,4 +115,42 @@ export default {
       };
     }
   },
+  async addSuspensionStatus(parent, args, context, info) {
+    try {
+      let { Accounts } = context.collections;
+      let { user } = context;
+      let { userId, suspend } = args;
+
+      console.log("user is ");
+      console.log(user);
+
+      console.log("user suspension status is ");
+      console.log(suspend);
+
+      // console.log("suspend is ");
+      // console.log(suspend);
+      // console.log(typeof suspend);
+      // console.log("args are ");
+      // console.log(args);
+      // console.log("user suspension status");
+      // console.log(user.suspend);
+      // if (user) {
+      //   let suspendStatus = await Accounts.updateOne(
+      //     { userId },
+      //     {
+      //       $set: { suspend: Boolean(suspend) },
+      //     }
+      //   );
+      //   if (suspendStatus) {
+      //     return suspendStatus;
+      //   } else {
+      //     return false;
+      //   }
+      // }
+    } catch (err) {
+      console.log("Error", err);
+
+      return false;
+    }
+  },
 };

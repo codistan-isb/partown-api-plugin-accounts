@@ -17,38 +17,99 @@ const Metafield = new SimpleSchema({
   key: {
     type: String,
     max: 30,
-    optional: true
+    optional: true,
   },
   namespace: {
     type: String,
     max: 20,
-    optional: true
+    optional: true,
   },
   scope: {
     type: String,
-    optional: true
+    optional: true,
   },
   value: {
     type: String,
-    optional: true
+    optional: true,
   },
   valueType: {
     type: String,
-    optional: true
+    optional: true,
   },
   description: {
     type: String,
-    optional: true
-  }
+    optional: true,
+  },
 });
 
-const withoutCodeCountries = ["AO", "AG", "AW", "BS", "BZ", "BJ", "BW",
-  "BF", "BI", "CM", "CF", "KM", "CG", "CD", "CK", "CI", "DJ",
-  "DM", "GQ", "ER", "FJ", "TF", "GM", "GH", "GD", "GN", "GY",
-  "HK", "IE", "JM", "KE", "KI", "MO", "MW", "ML", "MR", "MU",
-  "MS", "NR", "AN", "NU", "KP", "PA", "QA", "RW", "KN", "LC",
-  "ST", "SA", "SC", "SL", "SB", "SO", "SR", "SY", "TZ", "TL",
-  "TK", "TO", "TT", "TV", "UG", "AE", "VU", "YE", "ZW"];
+const withoutCodeCountries = [
+  "AO",
+  "AG",
+  "AW",
+  "BS",
+  "BZ",
+  "BJ",
+  "BW",
+  "BF",
+  "BI",
+  "CM",
+  "CF",
+  "KM",
+  "CG",
+  "CD",
+  "CK",
+  "CI",
+  "DJ",
+  "DM",
+  "GQ",
+  "ER",
+  "FJ",
+  "TF",
+  "GM",
+  "GH",
+  "GD",
+  "GN",
+  "GY",
+  "HK",
+  "IE",
+  "JM",
+  "KE",
+  "KI",
+  "MO",
+  "MW",
+  "ML",
+  "MR",
+  "MU",
+  "MS",
+  "NR",
+  "AN",
+  "NU",
+  "KP",
+  "PA",
+  "QA",
+  "RW",
+  "KN",
+  "LC",
+  "ST",
+  "SA",
+  "SC",
+  "SL",
+  "SB",
+  "SO",
+  "SR",
+  "SY",
+  "TZ",
+  "TL",
+  "TK",
+  "TO",
+  "TT",
+  "TV",
+  "UG",
+  "AE",
+  "VU",
+  "YE",
+  "ZW",
+];
 
 /**
  * @name AccountProfileAddress
@@ -58,6 +119,7 @@ const withoutCodeCountries = ["AO", "AG", "AW", "BS", "BZ", "BJ", "BW",
  * @property {String} fullName required
  * @property {String} firstName
  * @property {String} lastName
+ * @property {String} suspend
  * @property {String} address1 required
  * @property {String} address2
  * @property {String} city required
@@ -73,48 +135,53 @@ const withoutCodeCountries = ["AO", "AG", "AW", "BS", "BZ", "BJ", "BW",
  * @property {Metafield[]} metafields
  */
 export const AccountProfileAddress = new SimpleSchema({
-  "_id": String,
-  "fullName": {
+  _id: String,
+  fullName: {
     type: String,
-    label: "Full name"
+    label: "Full name",
   },
-  "firstName": {
+  firstName: {
     type: String,
     label: "First name",
-    optional: true
+    optional: true,
   },
-  "lastName": {
+  lastName: {
     type: String,
     label: "Last name",
-    optional: true
+    optional: true,
   },
-  "address1": {
+  suspend: {
+    type: Boolean,
+    label: "Suspend",
+    optional: true,
+  },
+  address1: {
     label: "Address 1",
-    type: String
+    type: String,
   },
-  "address2": {
+  address2: {
     label: "Address 2",
     type: String,
-    optional: true
+    optional: true,
   },
-  "city": {
+  city: {
     type: String,
-    label: "City"
+    label: "City",
   },
-  "company": {
+  company: {
     type: String,
     label: "Company",
-    optional: true
+    optional: true,
   },
-  "phone": {
+  phone: {
     type: String,
-    label: "Phone"
+    label: "Phone",
   },
-  "region": {
+  region: {
     label: "State/Province/Region",
-    type: String
+    type: String,
   },
-  "postal": {
+  postal: {
     label: "ZIP/Postal Code",
     type: String,
     optional: true,
@@ -126,42 +193,42 @@ export const AccountProfileAddress = new SimpleSchema({
         }
       }
       return true;
-    }
+    },
   },
-  "country": {
+  country: {
     type: String,
-    label: "Country"
+    label: "Country",
   },
-  "isCommercial": {
+  isCommercial: {
     label: "This is a commercial address.",
     type: Boolean,
-    defaultValue: false
+    defaultValue: false,
   },
-  "isBillingDefault": {
+  isBillingDefault: {
     label: "Make this your default billing address?",
     type: Boolean,
     defaultValue: false,
-    optional: true
+    optional: true,
   },
-  "isShippingDefault": {
+  isShippingDefault: {
     label: "Make this your default shipping address?",
     type: Boolean,
     defaultValue: false,
-    optional: true
+    optional: true,
   },
-  "failedValidation": {
+  failedValidation: {
     label: "Failed validation",
     type: Boolean,
     defaultValue: false,
-    optional: true
+    optional: true,
   },
-  "metafields": {
+  metafields: {
     type: Array,
-    optional: true
+    optional: true,
   },
   "metafields.$": {
-    type: Metafield
-  }
+    type: Metafield,
+  },
 });
 
 /**
@@ -174,12 +241,12 @@ export const AccountProfileAddress = new SimpleSchema({
 const TaxSettings = new SimpleSchema({
   exemptionNo: {
     type: String,
-    optional: true
+    optional: true,
   },
   customerUsageType: {
     type: String,
-    optional: true
-  }
+    optional: true,
+  },
 });
 
 /**
@@ -195,68 +262,74 @@ const TaxSettings = new SimpleSchema({
  * @property {String} currency User currency
  */
 export const Profile = new SimpleSchema({
-  "addressBook": {
+  addressBook: {
     type: Array,
-    optional: true
+    optional: true,
   },
   "addressBook.$": {
-    type: AccountProfileAddress
+    type: AccountProfileAddress,
   },
-  "firstName": {
+  firstName: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "lastName": {
+  lastName: {
     type: String,
-    optional: true
-  }, dob: {
+    optional: true,
+  },
+  suspend: {
+    type: Boolean,
+    label: "Suspend",
+    optional: true,
+  },
+  dob: {
     type: String,
     label: "dob",
-    optional: true
+    optional: true,
   },
   phone: {
     label: "phone",
     type: String,
-    optional: true
+    optional: true,
   },
-  "invited": {
+  invited: {
     type: Boolean,
     optional: true,
-    defaultValue: false
+    defaultValue: false,
   },
-  "name": {
+  name: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "picture": {
+  picture: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "bio": {
+  bio: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "username": {
+  username: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "currency": {
+  currency: {
     label: "User Currency",
     type: String,
     optional: true,
-    mockValue: null
+    mockValue: null,
   },
-  "language": {
+  language: {
     label: "User language",
     type: String,
-    optional: true
+    optional: true,
   },
-  "preferences": {
+  preferences: {
     label: "User preferences",
     type: Object,
     blackbox: true,
-    optional: true
-  }
+    optional: true,
+  },
 });
 
 /**
@@ -271,19 +344,18 @@ export const Email = new SimpleSchema({
   provides: {
     type: String,
     defaultValue: "default",
-    optional: true
+    optional: true,
   },
   address: {
     type: String,
-    regEx: SimpleSchema.RegEx.Email
+    regEx: SimpleSchema.RegEx.Email,
   },
   verified: {
     type: Boolean,
     defaultValue: false,
-    optional: true
-  }
+    optional: true,
+  },
 });
-
 
 export const contactInfo = new SimpleSchema({
   email: String,
@@ -292,9 +364,8 @@ export const contactInfo = new SimpleSchema({
   Address2: { type: String, optional: true, label: "Address2" },
   Address3: { type: String, optional: true, label: "Address3" },
   country: String,
-  postcode: String
+  postcode: String,
 });
-
 
 export const nextKin = new SimpleSchema({
   name: String,
@@ -302,8 +373,23 @@ export const nextKin = new SimpleSchema({
   phone: String,
   email: String,
   gender: String,
-  relation: String
-})
+  relation: String,
+});
+
+const contactPreferences = new SimpleSchema({
+  email: { type: Boolean, optional: true, label: "email" },
+  sms: { type: Boolean, optional: true, label: "sms" },
+});
+export const userPreferences = new SimpleSchema({
+  contactPreferences: contactPreferences,
+  alertsPreferences: {
+    type: Array,
+    optional: true,
+  },
+  "alertsPreferences.$": {
+    type: String,
+  },
+});
 /**
  * @name Account
  * @memberof Schemas
@@ -328,139 +414,140 @@ export const nextKin = new SimpleSchema({
 const wallet = new SimpleSchema({
   currency: {
     type: String,
-    optional: true
+    optional: true,
   },
   amount: {
     type: Number,
-    optional: true
-  }
-})
-
+    optional: true,
+  },
+});
 
 const govId = new SimpleSchema({
   key: {
     type: String,
-    optional: true
+    optional: true,
   },
   value: {
     type: String,
-    optional: true
-  }
-})
+    optional: true,
+  },
+});
 
 const poAddress = new SimpleSchema({
   address: {
     type: String,
-    optional: true
+    optional: true,
   },
   type: {
     type: String,
-    optional: true
+    optional: true,
   },
   document: {
     type: String,
-    optional: true
-  }
-
-})
+    optional: true,
+  },
+});
 export const Account = new SimpleSchema({
-  "_id": String,
-  "userId": String,
-  "sessions": {
+  _id: String,
+  userId: String,
+  sessions: {
     type: Array,
-    optional: true
+    optional: true,
   },
   "sessions.$": {
-    type: String
+    type: String,
   },
 
-  "shopId": {
+  shopId: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "name": {
+  name: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "username": {
+  username: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "emails": {
+  emails: {
     type: Array,
-    optional: true
+    optional: true,
   },
   "emails.$": {
-    type: Email
+    type: Email,
   },
-  "acceptsMarketing": {
+  acceptsMarketing: {
     type: Boolean,
     defaultValue: false,
-    optional: true
+    optional: true,
   },
-  "state": {
+  state: {
     type: String,
     defaultValue: "new",
-    optional: true
+    optional: true,
   },
-  "taxSettings": {
+  taxSettings: {
     type: TaxSettings,
-    optional: true
+    optional: true,
   },
-  "note": {
+  note: {
     type: String,
-    optional: true
+    optional: true,
   },
-  "profile": {
+  profile: {
     type: Profile,
-    optional: true
+    optional: true,
   },
   dob: {
     type: String,
     label: "dob",
-    optional: true
+    optional: true,
   },
   phone: {
     label: "phone",
     type: String,
-    optional: true
+    optional: true,
   },
 
   wallet: {
     type: wallet,
-    optional: true
+    optional: true,
   },
   govId: [govId],
   poAddress: [poAddress],
-  "groups": {
+  groups: {
     type: Array, // groupIds that user belongs to
     optional: true,
-    defaultValue: []
+    defaultValue: [],
   },
   "groups.$": {
-    type: String
+    type: String,
   },
-  "metafields": {
+  metafields: {
     type: Array,
-    optional: true
+    optional: true,
   },
   "metafields.$": {
-    type: Metafield
+    type: Metafield,
   },
-  "createdAt": {
-    type: Date
-  },
-  "updatedAt": {
+  createdAt: {
     type: Date,
-    optional: true
   },
-  "nextKin": {
+  updatedAt: {
+    type: Date,
+    optional: true,
+  },
+  nextKin: {
     type: nextKin,
-    optional: true
-
+    optional: true,
+  },
+  userPreferences: {
+    type: userPreferences,
+    optional: true,
   },
 
-  "contactInfo": { type: contactInfo, optional: true }
+  contactInfo: { type: contactInfo, optional: true },
 });
 
 /**
@@ -480,17 +567,17 @@ export const Group = new SimpleSchema({
   name: String,
   description: {
     type: String,
-    optional: true
+    optional: true,
   },
   slug: String,
   shopId: {
     type: String,
-    optional: true
+    optional: true,
   },
   createdBy: {
     type: String,
-    optional: true
+    optional: true,
   },
   createdAt: Date,
-  updatedAt: Date
+  updatedAt: Date,
 });
