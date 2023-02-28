@@ -35,6 +35,21 @@ const contactInfo = new SimpleSchema({
   country: String,
   postcode: String,
 });
+const userBanksDetail = new SimpleSchema({
+  bankName: {
+    type: String,
+  },
+  accountNumber: {
+    type: String,
+  },
+  sortCode: {
+    type: String,
+    optional: true,
+  },
+  alias: {
+    type: String,
+  },
+});
 const govId = new SimpleSchema({
   key: {
     type: String,
@@ -89,6 +104,10 @@ const inputSchema = new SimpleSchema({
     type: Boolean,
     optional: true,
   },
+  transactionId: {
+    type: String,
+    optional: true,
+  },
   name: {
     type: String,
     optional: true,
@@ -114,6 +133,15 @@ const inputSchema = new SimpleSchema({
     label: "phone",
     type: String,
     optional: true,
+  },
+  userBanksDetail: {
+    type: Array,
+    label: "userBanksDetail",
+    defaultValue: [],
+    optional: true,
+  },
+  "userBanksDetail.$": {
+    type: userBanksDetail,
   },
   govId: {
     type: Array,
@@ -161,6 +189,7 @@ const inputSchema = new SimpleSchema({
  * @param {String} [input.language] - Language
  * @param {String} [input.lastName] - Last name
  * @param {String} [input.suspend] - Suspend
+ * @param {String} [input.transactionId] - transaction Id
  * @param {String} [input.name] - Name
  * @returns {Promise<Object>} Updated account document
  */
@@ -181,6 +210,7 @@ export default async function updateAccount(context, input) {
     language,
     lastName,
     suspend,
+    transactionId,
     name,
     note,
     picture,
@@ -192,6 +222,7 @@ export default async function updateAccount(context, input) {
     contactInfo,
     govId,
     poAddress,
+    userBanksDetail,
   } = input;
 
   const accountId = providedAccountId || accountIdFromContext;
@@ -239,6 +270,11 @@ export default async function updateAccount(context, input) {
   if (typeof suspend === "boolean" || suspend === null) {
     updates["profile.suspend"] = suspend;
     updatedFields.push("suspend");
+  }
+
+  if (typeof transactionId === "string" || transactionId === null) {
+    updates["profile.transactionId"] = transactionId;
+    updatedFields.push("transactionId");
   }
 
   if (typeof name === "string" || name === null) {
@@ -318,6 +354,12 @@ export default async function updateAccount(context, input) {
     // For some reason we store name in two places. Should fix eventually.
     updates.poAddress = poAddress ?? "null";
     updates["poAddress"] = poAddress ?? "null";
+  }
+  if (userBanksDetail) {
+    // For some reason we store name in two places. Should fix eventually.
+    updates.userBanksDetail = userBanksDetail;
+    updates["userBanksDetail"] = userBanksDetail;
+    updatedFields.push("userBanksDetail");
   }
   if (updatedFields.length === 0) {
     throw new ReactionError(

@@ -120,6 +120,7 @@ const withoutCodeCountries = [
  * @property {String} firstName
  * @property {String} lastName
  * @property {String} suspend
+ * @property {String} transactionId
  * @property {String} address1 required
  * @property {String} address2
  * @property {String} city required
@@ -153,6 +154,11 @@ export const AccountProfileAddress = new SimpleSchema({
   suspend: {
     type: Boolean,
     label: "Suspend",
+    optional: true,
+  },
+  transactionId: {
+    type: String,
+    label: "Transaction Id",
     optional: true,
   },
   address1: {
@@ -280,6 +286,11 @@ export const Profile = new SimpleSchema({
   suspend: {
     type: Boolean,
     label: "Suspend",
+    optional: true,
+  },
+  transactionId: {
+    type: String,
+    label: "Transaction Id",
     optional: true,
   },
   dob: {
@@ -422,6 +433,22 @@ const wallet = new SimpleSchema({
   },
 });
 
+const userBanksDetail = new SimpleSchema({
+  bankName: {
+    type: String,
+  },
+  accountNumber: {
+    type: String,
+  },
+  sortCode: {
+    type: String,
+    optional: true,
+  },
+  alias: {
+    type: String,
+  },
+});
+
 const govId = new SimpleSchema({
   key: {
     type: String,
@@ -509,10 +536,17 @@ export const Account = new SimpleSchema({
     type: String,
     optional: true,
   },
-
   wallet: {
     type: wallet,
     optional: true,
+  },
+  userBanksDetail: {
+    type: Array,
+    optional: true,
+    defaultValue: [],
+  },
+  "userBanksDetail.$": {
+    type: userBanksDetail,
   },
   govId: {
     type: Array,

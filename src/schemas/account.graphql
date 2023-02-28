@@ -123,6 +123,9 @@ input UpdateAccountInput {
   "Suspension status of the person this account represents"
   suspend: Boolean
 
+  "a unique auto generated transaction Id for each user"
+  transactionId: String
+
   "The full name of the person this account represents"
   name: String
 
@@ -141,8 +144,14 @@ input UpdateAccountInput {
   "phone number"
   phone: String
 
+  "government issued id of the user for verification"
   govId: [govIdInput]
+
+  "Proof of address of the user for verification"
   poAddress: [poAddressInput]
+
+  "bank(s) details against which funds are withdrawn"
+  userBanksDetail: [userBanksDetailInput]
 
   "Next of kin information"
   nextKin: NextKinInput
@@ -165,9 +174,23 @@ input govIdInput {
   value: String
 }
 
+input userBanksDetailInput {
+  bankName: String!
+  accountNumber: String!
+  sortCode: String
+  alias: String!
+}
+
 type govId {
   key: String
   value: String
+}
+
+type userBanksDetail {
+  bankName: String!
+  accountNumber: String!
+  sortCode: String
+  alias: String!
 }
 
 type poAddress {
@@ -283,6 +306,9 @@ type Account implements Node {
   "Suspension status of the person this account represents"
   suspend: Boolean
 
+  "a unique auto generated transaction Id for each user"
+  transactionId: String
+
   "Arbitrary additional metadata about this account"
   metafields: [Metafield]
 
@@ -326,6 +352,9 @@ type Account implements Node {
 
   "user gov id"
   govId: [govId]
+
+  "user bank(s) details"
+  userBanksDetail: [userBanksDetail]
 
   "user proof of address"
   poAddress: [poAddress]
@@ -596,6 +625,9 @@ extend type Mutation {
 
   "add suspension status for a user"
   suspendUser(userId: String, suspend: Boolean): Boolean
+
+  "create unique transaction Id"
+  createTransactionId(transactionId: String): Boolean
 
   "Add a new address to the `addressBook` field for an account"
   addAccountAddressBookEntry(

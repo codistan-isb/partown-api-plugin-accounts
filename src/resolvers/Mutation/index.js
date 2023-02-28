@@ -78,39 +78,49 @@ export default {
     try {
       let { Accounts } = context.collections;
       let { user } = context;
-      let { userId, wallet } = args.input;
+      let { wallet } = args.input;
+      console.log("user is ");
+      console.log(user);
+      let userId = user._id;
+      if (user) {
+        let wallets = await Accounts.updateOne(
+          { userId },
+          {
+            $inc: { "wallets.amount": wallet.amount },
+            $set: { "wallets.currency": wallet.currency },
+          }
+        );
+        console.log("walletInput", wallet.currency, wallet.amount);
 
-      if (!user) {
+        console.log("update output is ");
+        console.log(wallets);
+        if (wallets?.result?.n > 0) {
+          return {
+            // wallets,
+            status: 200,
+            success: true,
+            message: `data found.`,
+          };
+        } else {
+          return {
+            // wallets,
+            status: 200,
+            success: false,
+            message: `not updated`,
+          };
+        }
+      } else {
         return {
           success: false,
-          message: "User not found",
-          status: 200,
-        };
-      }
-      let accountInfo = await Accounts.find({ userId }).toArray();
-
-      const prevAmount = accountInfo[0].wallets.amount;
-      let newAmount = prevAmount + wallet.amount;
-      console.log("prevAmount is ", prevAmount);
-      console.log("new amount is ", newAmount);
-      const updatedWallet = await Accounts.updateOne(
-        { userId },
-        { $set: { "wallets.amount": newAmount } }
-      );
-      console.log("*****updated wallet result*****");
-      console.log(updatedWallet);
-      if (updatedWallet?.result?.n > 0) {
-        return {
-          success: true,
-          message: "wallet amount updated successfully",
-          status: 200,
+          message: `unAuthorized.`,
+          status: 401,
         };
       }
     } catch (err) {
-      console.log("Add Funds to Wallet Mutation", err);
+      console.log("Error", err);
       return {
         success: false,
-        message: `Server Error ${err}`,
+        message: `Server Error ${err}.`,
         status: 500,
       };
     }
@@ -139,6 +149,33 @@ export default {
       }
     } catch (err) {
       console.log("update user suspension status ", err);
+      return false;
+    }
+  },
+  async createTransactionId(parent, args, context, info) {
+    try {
+      let { Accounts } = context.collections;
+      let { user } = context;
+      let { transactionId } = args;
+
+      if (!user) {
+        return false;
+      }
+      // let accountInfo = await Accounts.find({ userId }).toArray();
+      let userId = user._id;
+      const updatedId = await Accounts.updateOne(
+        { userId },
+        { $set: { transactionId: transactionId } }
+      );
+      console.log("*****updated transaction Id result result*****");
+      console.log(updatedId);
+      if (updatedId?.result?.n > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.log("create user transaction Id ", err);
       return false;
     }
   },
