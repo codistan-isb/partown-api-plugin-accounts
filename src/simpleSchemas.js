@@ -514,8 +514,22 @@ export const Account = new SimpleSchema({
     type: wallet,
     optional: true,
   },
-  govId: [govId],
-  poAddress: [poAddress],
+  govId: {
+    type: Array,
+    optional: true,
+    defaultValue: [],
+  },
+  "govId.$": {
+    type: govId,
+  },
+  poAddress: {
+    type: Array,
+    optional: true,
+    defaultValue: [],
+  },
+  "poAddress.$": {
+    type: poAddress,
+  },
   groups: {
     type: Array, // groupIds that user belongs to
     optional: true,

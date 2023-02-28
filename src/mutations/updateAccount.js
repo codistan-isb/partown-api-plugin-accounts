@@ -122,6 +122,7 @@ const inputSchema = new SimpleSchema({
   },
   "govId.$": {
     type: govId,
+    optional: true,
   },
   poAddress: {
     type: Array,

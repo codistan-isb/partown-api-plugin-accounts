@@ -149,6 +149,7 @@ input UpdateAccountInput {
 
   "User Preferences Input"
   userPreferences: userPreferencesInput
+
   "User contact information"
   contactInfo: contactInfoInput
 }
@@ -594,7 +595,7 @@ extend type Mutation {
   withdrawFundsFromUserWallet(amount: Float): userWallet
 
   "add suspension status for a user"
-  addSuspensionStatus(userId: String, suspend: Boolean): Boolean
+  suspendUser(userId: String, suspend: Boolean): Boolean
 
   "Add a new address to the `addressBook` field for an account"
   addAccountAddressBookEntry(
