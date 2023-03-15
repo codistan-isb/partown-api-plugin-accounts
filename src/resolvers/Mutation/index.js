@@ -17,6 +17,7 @@ import updateAccountAddressBookEntry from "./updateAccountAddressBookEntry.js";
 import updateAccountGroup from "./updateAccountGroup.js";
 import updateAdminUIAccess from "./updateAdminUIAccess.js";
 import updateGroupsForAccounts from "./updateGroupsForAccounts.js";
+import decodeOpaqueId from "@reactioncommerce/api-utils/decodeOpaqueId.js";
 
 export default {
   addAccountAddressBookEntry,
@@ -77,52 +78,25 @@ export default {
   async updateUserFunds(parent, args, context, info) {
     try {
       let { Accounts } = context.collections;
-      let { user } = context;
-      let { wallet } = args.input;
-      console.log("user is ");
-      console.log(user);
-      let userId = user._id;
-      if (user) {
-        let wallets = await Accounts.updateOne(
-          { userId },
-          {
-            $inc: { "wallets.amount": wallet.amount },
-            $set: { "wallets.currency": wallet.currency },
-          }
-        );
-        console.log("walletInput", wallet.currency, wallet.amount);
+      let { authToken } = context;
+      let { wallet, userId } = args.input;
 
-        console.log("update output is ");
-        console.log(wallets);
-        if (wallets?.result?.n > 0) {
-          return {
-            // wallets,
-            status: 200,
-            success: true,
-            message: `data found.`,
-          };
-        } else {
-          return {
-            // wallets,
-            status: 200,
-            success: false,
-            message: `not updated`,
-          };
-        }
-      } else {
-        return {
-          success: false,
-          message: `unAuthorized.`,
-          status: 401,
-        };
+      if (!authToken || !context.userId) {
+        return new Error("Unauthorized");
       }
+
+      console.log("input wallet is ", wallet);
+      let wallets = await Accounts.updateOne(
+        { userId: decodeOpaqueId(userId).id },
+        {
+          $inc: { "wallets.amount": wallet.amount },
+          $set: { "wallets.currency": wallet.currency },
+        }
+      );
+      console.log("wallets are ", wallets);
+      return wallets?.result?.n > 0;
     } catch (err) {
-      console.log("Error", err);
-      return {
-        success: false,
-        message: `Server Error ${err}.`,
-        status: 500,
-      };
+      return err;
     }
   },
   async suspendUser(parent, args, context, info) {

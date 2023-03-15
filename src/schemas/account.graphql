@@ -618,7 +618,7 @@ extend type Mutation {
   addUserWallet(input: walletInput): userWallet
 
   "add/withdraw funds to and from user wallet"
-  updateUserFunds(input: walletInput!): userWallet
+  updateUserFunds(input: walletInput!): Boolean
 
   "withdraw funds from user wallet"
   withdrawFundsFromUserWallet(amount: Float): userWallet
