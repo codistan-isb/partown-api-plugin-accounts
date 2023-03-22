@@ -431,6 +431,10 @@ const wallet = new SimpleSchema({
     type: Number,
     optional: true,
   },
+  escrow: {
+    type: Number,
+    optional: true,
+  },
 });
 
 const userBanksDetail = new SimpleSchema({

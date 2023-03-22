@@ -201,7 +201,8 @@ type poAddress {
 
 type wallet {
   currency: String
-  amount: Int
+  amount: Float
+  escrow: Float
 }
 
 type userPreferences {
@@ -594,7 +595,8 @@ type UpdateGroupsForAccountsPayload {
 
 input walletInfo {
   currency: String
-  amount: Int
+  amount: Float
+  escrow: Float
 }
 
 input walletInput {

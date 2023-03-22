@@ -85,7 +85,6 @@ export default {
         return new Error("Unauthorized");
       }
 
-      console.log("input wallet is ", wallet);
       let wallets = await Accounts.updateOne(
         { userId: decodeOpaqueId(userId).id },
         {
@@ -93,7 +92,7 @@ export default {
           $set: { "wallets.currency": wallet.currency },
         }
       );
-      console.log("wallets are ", wallets);
+
       return wallets?.result?.n > 0;
     } catch (err) {
       return err;
