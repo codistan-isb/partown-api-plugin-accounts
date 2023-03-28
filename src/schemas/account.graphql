@@ -205,6 +205,14 @@ type wallet {
   escrow: Float
 }
 
+type accountPermissions {
+  manageUsers: [PermissionsEnum]
+  manageProperties: [PermissionsEnum]
+  manageReports: [PermissionsEnum]
+  manageRates: [PermissionsEnum]
+  managePermissions: [PermissionsEnum]
+}
+
 type userPreferences {
   contactPreferences: contactPreferences
   alertsPreferences: [String]
@@ -347,6 +355,9 @@ type Account implements Node {
 
   "user wallet"
   wallet: wallet
+
+  "user accounts permissions"
+  accountPermissions: accountPermissions
 
   "user preferences"
   userPreferences: userPreferences
@@ -615,6 +626,20 @@ type userWallet {
   message: String
 }
 
+enum PermissionsEnum {
+  read
+  edit
+  delete
+}
+
+input UserPermissions {
+  manageUsers: [PermissionsEnum]
+  manageProperties: [PermissionsEnum]
+  manageReports: [PermissionsEnum]
+  manageRates: [PermissionsEnum]
+  managePermissions: [PermissionsEnum]
+}
+
 extend type Mutation {
   "add wallet for user"
   addUserWallet(input: walletInput): userWallet
@@ -624,6 +649,9 @@ extend type Mutation {
 
   "withdraw funds from user wallet"
   withdrawFundsFromUserWallet(amount: Float): userWallet
+
+  "handle User account permissions"
+  updateUserPermissions(accountId: String!, input: UserPermissions): Boolean
 
   "add suspension status for a user"
   suspendUser(userId: String, suspend: Boolean): Boolean

@@ -401,6 +401,44 @@ export const userPreferences = new SimpleSchema({
     type: String,
   },
 });
+
+export const accountPermissions = new SimpleSchema({
+  manageUsers: {
+    type: Array,
+    optional: true,
+  },
+  "manageUsers.$": {
+    type: String,
+  },
+  manageProperties: {
+    type: Array,
+    optional: true,
+  },
+  "manageProperties.$": {
+    type: String,
+  },
+  manageReports: {
+    type: Array,
+    optional: true,
+  },
+  "manageReports.$": {
+    type: String,
+  },
+  manageRates: {
+    type: Array,
+    optional: true,
+  },
+  "manageRates.$": {
+    type: String,
+  },
+  managePermissions: {
+    type: Array,
+    optional: true,
+  },
+  "managePermissions.$": {
+    type: String,
+  },
+});
 /**
  * @name Account
  * @memberof Schemas
@@ -598,7 +636,10 @@ export const Account = new SimpleSchema({
     type: userPreferences,
     optional: true,
   },
-
+  accountPermissions: {
+    type: accountPermissions,
+    optional: true,
+  },
   contactInfo: { type: contactInfo, optional: true },
 });
 

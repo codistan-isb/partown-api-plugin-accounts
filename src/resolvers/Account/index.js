@@ -22,6 +22,7 @@ export default {
   transactionId: (account) => account.profile.transactionId,
   phone: (account) => account.profile.phone,
   wallet: (account) => account.wallets ?? 0,
+  accountPermissions: (account) => account.accountPermissions,
   govId: (account) => account.govId ?? [],
   userBanksDetail: (account) => account.userBanksDetail ?? [],
   userPreferences: (account) => account.userPreferences ?? {},

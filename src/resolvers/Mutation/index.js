@@ -18,6 +18,10 @@ import updateAccountGroup from "./updateAccountGroup.js";
 import updateAdminUIAccess from "./updateAdminUIAccess.js";
 import updateGroupsForAccounts from "./updateGroupsForAccounts.js";
 import decodeOpaqueId from "@reactioncommerce/api-utils/decodeOpaqueId.js";
+import checkUserPermissionsGroup from "../../util/checkUserPermissionsGroup.js";
+import { generateRandomString } from "../../util/generateRandom.js";
+import getAccountGroup from "../../util/getAccountGroup.js";
+import getPermissionsMapping from "../../util/getPermissionsMapping.js";
 
 export default {
   addAccountAddressBookEntry,
@@ -150,6 +154,68 @@ export default {
     } catch (err) {
       console.log("create user transaction Id ", err);
       return false;
+    }
+  },
+  async updateUserPermissions(parent, args, context, info) {
+    try {
+      const { authToken, userId, collections } = context;
+      const { Accounts } = collections;
+      const { accountId, input } = args;
+      const decodedShopId = decodeOpaqueId(process.env.SHOP_ID).id;
+
+      let permissions = getPermissionsMapping(input);
+
+      if (!authToken || !userId) return new Error("Unauthorized");
+
+      await context.validatePermissions("reaction:legacy:groups", "update", {
+        shopId: decodedShopId,
+      });
+
+      const decodedAccountId = decodeOpaqueId(accountId).id;
+      const check = await checkUserPermissionsGroup(context, decodedAccountId);
+
+      if (!check) {
+        let random = generateRandomString();
+        const { group } = await context.mutations.createAccountGroup(
+          context.getInternalContext(),
+          {
+            group: {
+              name: random,
+              slug: random,
+            },
+            createdBy: userId,
+            shopId: decodedShopId,
+          }
+        );
+
+        await Accounts.update(
+          {
+            _id: decodedAccountId,
+          },
+          { $set: { groups: [group?._id], accountPermissions: input } }
+        );
+      }
+      let groupId = await getAccountGroup(context, accountId);
+      const groupInput = {
+        group: {
+          permissions: permissions,
+        },
+      };
+
+      const group = await context.mutations.updateAccountGroup(context, {
+        ...groupInput,
+        groupId: decodeOpaqueId(groupId).id,
+        shopId: decodedShopId,
+      });
+
+      await Accounts.update(
+        { _id: decodedAccountId },
+        { $set: { accountPermissions: input } }
+      );
+      return true;
+    } catch (err) {
+      console.log("update user permissions error");
+      return err;
     }
   },
 };

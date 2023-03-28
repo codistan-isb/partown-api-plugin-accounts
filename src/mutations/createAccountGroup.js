@@ -26,11 +26,13 @@ export default async function createAccountGroup(context, input) {
     appEvents,
     collections: { Groups },
     simpleSchemas: { Group },
-    userId
+    userId,
   } = context;
 
   // we are limiting group method actions to only users within the account managers role
-  await context.validatePermissions("reaction:legacy:groups", "create", { shopId });
+  await context.validatePermissions("reaction:legacy:groups", "create", {
+    shopId,
+  });
 
   const nowDate = new Date();
   const newGroup = Object.assign({}, group, {
@@ -39,7 +41,7 @@ export default async function createAccountGroup(context, input) {
     createdBy: accountId,
     shopId,
     slug: group.slug || getSlug(group.name),
-    updatedAt: nowDate
+    updatedAt: nowDate,
   });
 
   // ensure one group type per shop
@@ -68,7 +70,7 @@ export default async function createAccountGroup(context, input) {
 
   await appEvents.emit("afterAccountGroupCreate", {
     createdBy: userId,
-    group: newGroup
+    group: newGroup,
   });
 
   return { group: newGroup };

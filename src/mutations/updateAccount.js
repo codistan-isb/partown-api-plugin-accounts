@@ -226,12 +226,14 @@ export default async function updateAccount(context, input) {
   } = input;
 
   const accountId = providedAccountId || accountIdFromContext;
+
   if (!accountId) throw new ReactionError("access-denied", "Access Denied");
 
   const account = await Accounts.findOne(
     { _id: accountId },
     { projection: { userId: 1 } }
   );
+
   if (!account) throw new ReactionError("not-found", "No account found");
 
   await context.validatePermissions(
