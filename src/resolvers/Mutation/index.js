@@ -218,4 +218,29 @@ export default {
       return err;
     }
   },
+  async updateUserWallet(parent, args, context, info) {
+    try {
+      let { Accounts } = context.collections;
+      let { authToken } = context;
+      let { wallet, userId } = args.input;
+
+      if (!authToken || !context.userId) {
+        return new Error("Unauthorized");
+      }
+
+      let { result } = await Accounts.updateOne(
+        { userId: decodeOpaqueId(userId).id },
+        {
+          $set: {
+            "wallets.amount": wallet.amount,
+            "wallets.escrow": wallet.escrow,
+          },
+        }
+      );
+
+      return result?.n > 0;
+    } catch (err) {
+      return err;
+    }
+  },
 };
