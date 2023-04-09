@@ -43,6 +43,40 @@ export default {
   updateAccountGroup,
   updateAdminUIAccess,
   updateGroupsForAccounts,
+  async verifyUserIdentification(parent, { accountId, shopId }, context, info) {
+    try {
+      let { Accounts } = context.collections;
+      await context.validatePermissions("reaction:legacy:accounts", "create", {
+        shopId,
+      });
+      const { result } = await Accounts.updateOne(
+        {
+          _id: decodeOpaqueId(accountId).id,
+        },
+        { $set: { identityVerified: true } }
+      );
+      return result?.n > 0;
+    } catch (err) {
+      return err;
+    }
+  },
+  async banAccount(parent, { accountId, shopId }, context, info) {
+    try {
+      let { Accounts } = context.collections;
+      await context.validatePermissions("reaction:legacy:accounts", "create", {
+        shopId,
+      });
+      const { result } = await Accounts.updateOne(
+        {
+          _id: decodeOpaqueId(accountId).id,
+        },
+        { $set: { isBanned: true } }
+      );
+      return result?.n > 0;
+    } catch (err) {
+      return err;
+    }
+  },
   async addUserWallet(parent, args, context, info) {
     try {
       let { Accounts } = context.collections;

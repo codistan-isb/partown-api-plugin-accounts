@@ -641,6 +641,12 @@ input UserPermissions {
 }
 
 extend type Mutation {
+  "verify user identification based on id and proof of address"
+  verifyUserIdentification(accountId: ID!, shopId: ID!): Boolean
+
+  "ban user"
+  banAccount(accountId: ID!, shopId: ID!): Boolean
+
   "add wallet for user"
   addUserWallet(input: walletInput): userWallet
 
@@ -734,6 +740,9 @@ extend type Query {
 
     "Return accounts that aren't in any groups"
     notInAnyGroups: Boolean
+
+    "Return account search based on account primary email address, first name or last name"
+    searchQuery: String
 
     "Return only results that come after this cursor. Use this with `first` to specify the number of results to return."
     after: ConnectionCursor

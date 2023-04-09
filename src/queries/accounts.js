@@ -12,7 +12,7 @@
 export default async function accounts(context, input) {
   const { collections } = context;
   const { Accounts } = collections;
-  const { groupIds, notInAnyGroups } = input;
+  const { groupIds, notInAnyGroups, searchQuery } = input;
 
   await context.validatePermissions("reaction:legacy:accounts", "read");
 
@@ -21,18 +21,39 @@ export default async function accounts(context, input) {
     selector.$or = [
       {
         groups: {
-          $in: groupIds
-        }
-      }, {
+          $in: groupIds,
+        },
+      },
+      {
         groups: {
-          $in: [null, []]
-        }
-      }
+          $in: [null, []],
+        },
+      },
     ];
   } else if (groupIds) {
     selector.groups = { $in: groupIds };
   } else if (notInAnyGroups) {
     selector.groups = { $in: [null, []] };
+  }
+
+ if (searchQuery) {
+    selector.$or = [
+      {
+        "emails.0.address": {
+          $regex: new RegExp(searchQuery, "i"),
+        },
+      },
+      {
+        "profile.firstName": {
+          $regex: new RegExp(searchQuery, "i"),
+        },
+      },
+      {
+        "profile.lastName": {
+          $regex: new RegExp(searchQuery, "i"),
+        },
+      },
+    ];
   }
 
   return Accounts.find(selector);
