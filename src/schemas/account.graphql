@@ -660,7 +660,11 @@ extend type Mutation {
   withdrawFundsFromUserWallet(amount: Float): userWallet
 
   "handle User account permissions"
-  updateUserPermissions(accountId: String!, input: UserPermissions): Boolean
+  updateUserPermissions(
+    accountId: ID!
+    shopId: ID!
+    input: UserPermissions
+  ): Boolean
 
   "add suspension status for a user"
   suspendUser(userId: String, suspend: Boolean): Boolean

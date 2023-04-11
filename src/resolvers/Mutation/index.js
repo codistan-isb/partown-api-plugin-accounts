@@ -194,8 +194,8 @@ export default {
     try {
       const { authToken, userId, collections } = context;
       const { Accounts } = collections;
-      const { accountId, input } = args;
-      const decodedShopId = decodeOpaqueId(process.env.SHOP_ID).id;
+      const { accountId, shopId, input } = args;
+      const decodedShopId = decodeOpaqueId(shopId).id;
 
       let permissions = getPermissionsMapping(input);
 
