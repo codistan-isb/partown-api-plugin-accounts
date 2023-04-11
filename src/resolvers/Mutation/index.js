@@ -229,14 +229,18 @@ export default {
           { $set: { groups: [group?._id], accountPermissions: input } }
         );
       }
-      let groupId = await getAccountGroup(context, accountId);
+
+      let groupId = await getAccountGroup(context, decodedAccountId);
       const groupInput = {
         group: {
           permissions: permissions,
         },
       };
+      
 
-      const group = await context.mutations.updateAccountGroup(context, {
+      console.log("group id is ", groupId);
+
+      await context.mutations.updateAccountGroup(context, {
         ...groupInput,
         groupId: decodeOpaqueId(groupId).id,
         shopId: decodedShopId,
