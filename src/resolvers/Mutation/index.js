@@ -67,11 +67,15 @@ export default {
       await context.validatePermissions("reaction:legacy:accounts", "create", {
         shopId,
       });
+
+      const res = await Accounts.findOne({
+        _id: decodedAccountId,
+      });
       const { result } = await Accounts.updateOne(
         {
           _id: decodedAccountId,
         },
-        { $set: { isBanned: true } }
+        { $set: { isBanned: res?.isBanned ? !res?.isBanned : true } }
       );
       await context.mutations.createNotification(context, {
         details: "Account Suspension",
