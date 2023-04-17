@@ -53,6 +53,16 @@ export default async function accounts(context, input) {
           $regex: new RegExp(searchQuery, "i"),
         },
       },
+      {
+        "profile.phone": {
+          $regex: new RegExp(searchQuery, "i"),
+        },
+      },
+      {
+        "profile.transactionId": {
+          $regex: new RegExp(searchQuery, "i"),
+        },
+      },
     ];
   }
 
