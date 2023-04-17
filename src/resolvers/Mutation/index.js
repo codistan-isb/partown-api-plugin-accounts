@@ -63,15 +63,24 @@ export default {
   async banAccount(parent, { accountId, shopId }, context, info) {
     try {
       let { Accounts } = context.collections;
+      const decodedAccountId = decodeOpaqueId(accountId).id;
       await context.validatePermissions("reaction:legacy:accounts", "create", {
         shopId,
       });
       const { result } = await Accounts.updateOne(
         {
-          _id: decodeOpaqueId(accountId).id,
+          _id: decodedAccountId,
         },
         { $set: { isBanned: true } }
       );
+      await context.mutations.createNotification(context, {
+        details: "Account Suspension",
+        hasDetails: true,
+        message: "Your Account has been banned",
+        to: decodedAccountId,
+        type: "banUser",
+      });
+
       return result?.n > 0;
     } catch (err) {
       return err;
@@ -236,7 +245,6 @@ export default {
           permissions: permissions,
         },
       };
-      
 
       console.log("group id is ", groupId);
 

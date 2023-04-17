@@ -36,7 +36,7 @@ export default async function accounts(context, input) {
     selector.groups = { $in: [null, []] };
   }
 
- if (searchQuery) {
+  if (searchQuery) {
     selector.$or = [
       {
         "emails.0.address": {
