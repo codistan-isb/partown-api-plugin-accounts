@@ -65,6 +65,6 @@ export default async function accounts(context, input) {
       },
     ];
   }
-
+  console.log("Accounts are ", Accounts.find(selector));
   return Accounts.find(selector);
 }

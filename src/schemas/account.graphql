@@ -375,6 +375,7 @@ type Account implements Node {
   dob: String
   contactInfo: contactInfo
 }
+
 enum Gender {
   Male
   Female
@@ -640,7 +641,22 @@ input UserPermissions {
   managePermissions: [PermissionsEnum]
 }
 
+input contactUsInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  contactNumber: String!
+  officeAddress: String
+  emailMessage: String!
+}
+
 extend type Mutation {
+  "Invite user"
+  inviteUser(emails: [String!]!): Boolean
+
+  "Contact the platform owner"
+  contactUs(input: contactUsInput): Boolean
+
   "verify user identification based on id and proof of address"
   verifyUserIdentification(accountId: ID!, shopId: ID!): Boolean
 

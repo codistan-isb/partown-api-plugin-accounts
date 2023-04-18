@@ -22,7 +22,9 @@ import checkUserPermissionsGroup from "../../util/checkUserPermissionsGroup.js";
 import { generateRandomString } from "../../util/generateRandom.js";
 import getAccountGroup from "../../util/getAccountGroup.js";
 import getPermissionsMapping from "../../util/getPermissionsMapping.js";
-
+import inviteUserEmail from "../../util/inviteUserEmail.js";
+import ReactionError from "@reactioncommerce/reaction-error";
+import contactUsEmail from "../../util/contactUsEmail.js";
 export default {
   addAccountAddressBookEntry,
   addAccountEmailRecord,
@@ -289,6 +291,31 @@ export default {
       );
 
       return result?.n > 0;
+    } catch (err) {
+      return err;
+    }
+  },
+  async inviteUser(parent, { emails }, context, info) {
+    try {
+      const { userId, authToken } = context;
+
+      const lowerCaseArray = emails.map((item) => item.toLowerCase());
+
+      if (!userId || !authToken) return new Error("Unauthorized");
+
+      for (const email of lowerCaseArray) {
+        await inviteUserEmail(context, email, userId);
+      }
+
+      return null;
+    } catch (err) {
+      return err;
+    }
+  },
+  async contactUs(parent, args, context, info) {
+    try {
+      await contactUsEmail(context, args, userId);
+      return null;
     } catch (err) {
       return err;
     }
