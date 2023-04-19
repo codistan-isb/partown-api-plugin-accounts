@@ -212,7 +212,8 @@ export default {
       const { accountId, shopId, input } = args;
       const decodedShopId = decodeOpaqueId(shopId).id;
 
-      let permissions = getPermissionsMapping(input);
+      let { permissionsArray, additionalPermissionsArray } =
+        getPermissionsMapping(input); // Destructure the result of getPermissionsMapping into two variables
 
       if (!authToken || !userId) return new Error("Unauthorized");
 
@@ -221,16 +222,19 @@ export default {
       });
 
       const decodedAccountId = decodeOpaqueId(accountId).id;
-      const check = await checkUserPermissionsGroup(context, decodedAccountId);
+      const { check1, check2 } = await checkUserPermissionsGroup(
+        context,
+        decodedAccountId
+      );
 
-      if (!check) {
+      if (!check1) {
         let random = generateRandomString();
         const { group } = await context.mutations.createAccountGroup(
           context.getInternalContext(),
           {
             group: {
-              name: random,
-              slug: random,
+              name: `product-${random}`,
+              slug: `product-${random}`,
             },
             createdBy: userId,
             shopId: decodedShopId,
@@ -246,18 +250,53 @@ export default {
       }
 
       let groupId = await getAccountGroup(context, decodedAccountId);
+
       const groupInput = {
         group: {
-          permissions: permissions,
+          permissions: permissionsArray,
         },
       };
 
-      console.log("group id is ", groupId);
-
       await context.mutations.updateAccountGroup(context, {
         ...groupInput,
-        groupId: decodeOpaqueId(groupId).id,
+        groupId: groupId[0],
         shopId: decodedShopId,
+      });
+
+      const additionalGroupInput = {
+        // Create an additional group input object for additional permissions
+        group: {
+          permissions: additionalPermissionsArray,
+        },
+      };
+
+      if (!check2) {
+        const random2 = generateRandomString();
+        // Create a new group with additional permissions if needed
+
+        const { group: additionalGroup } =
+          await context.mutations.createAccountGroup(
+            context.getInternalContext(),
+            {
+              group: {
+                name: `users-${random2}`,
+                slug: `users-${random2}`,
+                permissions: additionalPermissionsArray,
+              },
+              createdBy: userId,
+            }
+          );
+        await Accounts.update(
+          {
+            _id: decodedAccountId,
+          },
+          { $push: { groups: additionalGroup?._id } }
+        );
+      }
+
+      await context.mutations.updateAccountGroup(context, {
+        ...additionalGroupInput,
+        groupId: groupId[1],
       });
 
       await Accounts.update(
@@ -270,6 +309,7 @@ export default {
       return err;
     }
   },
+
   async updateUserWallet(parent, args, context, info) {
     try {
       let { Accounts } = context.collections;

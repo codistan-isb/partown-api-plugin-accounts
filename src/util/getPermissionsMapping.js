@@ -1,13 +1,13 @@
 export default function getPermissionsMapping(input) {
   const permissionMap = {
     manageUsers: {
-      read: "reaction:legacy:accounts/view",
-      edit: "reaction:legacy:accounts/edit",
+      read: "reaction:legacy:accounts/read",
+      edit: "reaction:legacy:accounts/create",
       delete: "reaction:legacy:accounts/remove",
     },
     manageProperties: {
       read: "reaction:legacy:products/read",
-      edit: "reaction:legacy:products/update",
+      edit: "reaction:legacy:products/create",
       delete: "reaction:legacy:products/remove",
     },
     manageReports: {
@@ -29,13 +29,19 @@ export default function getPermissionsMapping(input) {
   };
 
   let permissionsArray = [];
+  let additionalPermissionsArray = [];
+
   for (const [permission, values] of Object.entries(input)) {
     if (permissionMap[permission]) {
       for (const value of values) {
-        permissionsArray.push(permissionMap[permission][value]);
+        if (permission === "manageUsers") {
+          additionalPermissionsArray.push(permissionMap[permission][value]);
+        } else {
+          permissionsArray.push(permissionMap[permission][value]);
+        }
       }
     }
   }
 
-  return permissionsArray;
+  return { permissionsArray, additionalPermissionsArray };
 }

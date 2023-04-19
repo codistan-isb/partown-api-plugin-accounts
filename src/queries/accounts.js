@@ -12,7 +12,7 @@
 export default async function accounts(context, input) {
   const { collections } = context;
   const { Accounts } = collections;
-  const { groupIds, notInAnyGroups, searchQuery } = input;
+  const { groupIds, notInAnyGroups, searchQuery, filter } = input;
 
   await context.validatePermissions("reaction:legacy:accounts", "read");
 
@@ -65,6 +65,11 @@ export default async function accounts(context, input) {
       },
     ];
   }
-  console.log("Accounts are ", Accounts.find(selector));
+  if (filter === "pending") {
+    selector.identityVerified = false;
+  } else if (filter === "blocked") {
+    selector.isBanned = true;
+  }
+
   return Accounts.find(selector);
 }

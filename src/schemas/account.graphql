@@ -749,12 +749,20 @@ extend type Mutation {
   ): UpdateGroupsForAccountsPayload
 }
 
+enum accountsFilterEnum {
+  pending
+  blocked
+}
+
 extend type Query {
   "Returns the account with the provided ID"
   account("The account ID" id: ID!): Account
 
   "Returns accounts optionally filtered by account groups"
   accounts(
+    "filter all, pending verification and banned users"
+    filter: accountsFilterEnum
+
     "Return only accounts in any of these groups"
     groupIds: [ID]
 

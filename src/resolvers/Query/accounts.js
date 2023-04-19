@@ -20,6 +20,7 @@ export default async function accounts(_, args, context, info) {
     groupIds: opaqueGroupIds,
     notInAnyGroups,
     searchQuery,
+    filter,
     ...connectionArgs
   } = args;
 
@@ -34,6 +35,7 @@ export default async function accounts(_, args, context, info) {
     groupIds,
     notInAnyGroups,
     searchQuery,
+    filter,
   });
 
   return getPaginatedResponse(query, connectionArgs, {

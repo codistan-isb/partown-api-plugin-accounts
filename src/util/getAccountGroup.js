@@ -9,6 +9,6 @@ export default async function getAccountGroup(context, userId) {
   let result = await Accounts.findOne({
     _id: userId,
   });
-  console.log("result is ", result?.groups[0]);
-  return result?.groups[0];
+
+  return result?.groups;
 }
