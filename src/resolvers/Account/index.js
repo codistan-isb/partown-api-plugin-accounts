@@ -39,4 +39,17 @@ export default {
     return (primaryRecord && primaryRecord.address) || "";
   },
   username: (account) => account.profile.username || account.username,
+  isAdmin: (account) => {
+    if (
+      !account?.accountPermissions ||
+      !account?.accountPermissions?.manageUsers?.length ||
+      !account?.accountPermissions?.manageProperties?.length ||
+      !account?.accountPermissions?.manageReports?.length ||
+      !account?.accountPermissions?.manageRates?.length ||
+      !account?.accountPermissions?.managePermissions?.length
+    ) {
+      return false;
+    }
+    return true;
+  },
 };
