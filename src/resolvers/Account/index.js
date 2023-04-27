@@ -5,6 +5,14 @@ import addressBook from "./addressBook.js";
 import adminUIShops from "./adminUIShops.js";
 import groups from "./groups.js";
 
+const permissions = [
+  "manageUsers",
+  "manageProperties",
+  "manageReports",
+  "manageRates",
+  "managePermissions",
+];
+
 export default {
   _id: (account) => encodeAccountOpaqueId(account._id),
   addressBook,
@@ -41,15 +49,14 @@ export default {
   username: (account) => account.profile.username || account.username,
   isAdmin: (account) => {
     if (
-      !account?.accountPermissions ||
-      !account?.accountPermissions?.manageUsers?.length ||
-      !account?.accountPermissions?.manageProperties?.length ||
-      !account?.accountPermissions?.manageReports?.length ||
-      !account?.accountPermissions?.manageRates?.length ||
-      !account?.accountPermissions?.managePermissions?.length
+      account?.accountPermissions &&
+      permissions.some(
+        (permission) => account?.accountPermissions[permission]?.length || 0
+      )
     ) {
+      return true;
+    } else {
       return false;
     }
-    return true;
   },
 };
