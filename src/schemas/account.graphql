@@ -755,6 +755,8 @@ extend type Mutation {
 enum accountsFilterEnum {
   pending
   blocked
+  active
+  inactive
 }
 
 extend type Query {

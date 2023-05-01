@@ -9,6 +9,15 @@
  * @param {String} [input.notInAnyGroups] - Return accounts that aren't part of any groups
  * @returns {Promise} Mongo cursor
  */
+
+const permissions = [
+  "manageUsers",
+  "manageProperties",
+  "manageReports",
+  "manageRates",
+  "managePermissions",
+];
+
 export default async function accounts(context, input) {
   const { collections } = context;
   const { Accounts } = collections;
@@ -69,6 +78,16 @@ export default async function accounts(context, input) {
     selector.identityVerified = false;
   } else if (filter === "blocked") {
     selector.isBanned = true;
+  } else if (filter === "active") {
+    selector.accountPermissions = { $exists: true };
+    Object.keys(selector.accountPermissions).forEach((permission) => {
+      selector[`accountPermissions.${permission}`] = { $not: { $size: 0 } };
+    });
+  } else if (filter === "inactive") {
+    selector.$or = [
+      { accountPermissions: { $exists: false } },
+      { accountPermissions: { $size: 0 } },
+    ];
   }
 
   return Accounts.find(selector);

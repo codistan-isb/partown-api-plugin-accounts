@@ -46,6 +46,7 @@ export default {
     );
     return (primaryRecord && primaryRecord.address) || "";
   },
+  Product: { _id: "testID" },
   username: (account) => account.profile.username || account.username,
   isAdmin: (account) => {
     if (
