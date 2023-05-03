@@ -68,7 +68,7 @@ export default {
 
       if (!userId || !authToken) return new Error("Unauthorized");
 
-      let { Accounts } = context;
+      let { Accounts } = collections;
 
       const decodedAccountId = decodeOpaqueId(accountId).id;
       await context.validatePermissions("reaction:legacy:accounts", "create", {
