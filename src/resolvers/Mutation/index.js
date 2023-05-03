@@ -64,7 +64,12 @@ export default {
   },
   async banAccount(parent, { accountId, shopId }, context, info) {
     try {
-      let { Accounts } = context.collections;
+      const { userId, authToken, collections } = context;
+
+      if (!userId || !authToken) return new Error("Unauthorized");
+
+      let { Accounts } = context;
+
       const decodedAccountId = decodeOpaqueId(accountId).id;
       await context.validatePermissions("reaction:legacy:accounts", "create", {
         shopId,
@@ -73,6 +78,13 @@ export default {
       const res = await Accounts.findOne({
         _id: decodedAccountId,
       });
+
+      let msgString = res?.isBanned
+        ? "Congratulations, your account has been restored"
+        : "Your account has been banned";
+
+      let titleString = res?.isBanned ? "Account Restored" : "Account Banned";
+
       const { result } = await Accounts.updateOne(
         {
           _id: decodedAccountId,
@@ -80,11 +92,15 @@ export default {
         { $set: { isBanned: res?.isBanned ? !res?.isBanned : true } }
       );
       await context.mutations.createNotification(context, {
-        details: "Account Suspension",
+        title: titleString,
+        details: msgString,
         hasDetails: true,
-        message: "Your Account has been banned",
+        message: "click here to learn more",
+        status: null,
         to: decodedAccountId,
         type: "banUser",
+        image:
+          "https://images.pexels.com/photos/3172740/pexels-photo-3172740.jpeg?cs=srgb&dl=pexels-%E6%9D%8E%E8%BF%9B-3172740.jpg&fm=jpg&w=640&h=640",
       });
 
       return result?.n > 0;

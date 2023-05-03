@@ -1,7 +1,7 @@
 {
   "name": "@partown/api-plugin-accounts",
   "description": "Accounts plugin for the Reaction API",
-  "version": "16.6.5-development",
+  "version": "16.7.5-development",
   "main": "index.js",
   "type": "module",
   "engines": {
