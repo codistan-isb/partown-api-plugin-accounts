@@ -370,7 +370,10 @@ export default {
   },
   async contactUs(parent, args, context, info) {
     try {
-      await contactUsEmail(context, args, userId);
+
+
+
+      await contactUsEmail(context, args, args);
       return null;
     } catch (err) {
       return err;

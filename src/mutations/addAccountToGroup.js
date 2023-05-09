@@ -3,7 +3,7 @@ import SimpleSchema from "simpl-schema";
 
 const inputSchema = new SimpleSchema({
   accountId: String,
-  groupId: String
+  groupId: String,
 });
 
 /**
@@ -23,39 +23,46 @@ export default async function addAccountToGroup(context, input) {
   const { accountId, groupId } = input;
   const {
     appEvents,
-    collections: {
-      Accounts,
-      Groups
-    },
-    userId
+    collections: { Accounts, Groups },
+    userId,
   } = context;
 
   const groupToAddUserTo = await Groups.findOne({ _id: groupId });
-  if (!groupToAddUserTo) throw new ReactionError("not-found", "No group found with that ID");
+  if (!groupToAddUserTo)
+    throw new ReactionError("not-found", "No group found with that ID");
 
-  await context.validatePermissions("reaction:legacy:groups", "manage:accounts", { shopId: groupToAddUserTo.shopId });
+  await context.validatePermissions(
+    "reaction:legacy:groups",
+    "manage:accounts",
+    { shopId: groupToAddUserTo.shopId }
+  );
 
   const account = await Accounts.findOne({ _id: accountId });
-  if (!account) throw new ReactionError("not-found", "No account found with that ID");
+  if (!account)
+    throw new ReactionError("not-found", "No account found with that ID");
 
   const groupToAdd = account.groups.includes(groupId);
-  if (groupToAdd) throw new ReactionError("group-found", "Account is already in this group");
+  if (groupToAdd)
+    throw new ReactionError("group-found", "Account is already in this group");
 
   // Add new group to Account
   const accountGroups = Array.isArray(account.groups) ? account.groups : [];
   accountGroups.push(groupId);
 
-  await Accounts.updateOne({ _id: accountId }, { $set: { groups: accountGroups } });
+  await Accounts.updateOne(
+    { _id: accountId },
+    { $set: { groups: accountGroups } }
+  );
 
   const updatedAccount = {
     ...account,
-    groups: accountGroups
+    groups: accountGroups,
   };
 
   await appEvents.emit("afterAccountUpdate", {
     account: updatedAccount,
     updatedBy: userId,
-    updatedFields: ["groups"]
+    updatedFields: ["groups"],
   });
 
   // Return the group the account was added to
