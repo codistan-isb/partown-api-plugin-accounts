@@ -95,7 +95,7 @@ export default {
         title: titleString,
         details: msgString,
         hasDetails: true,
-        message: "click here to learn more",
+        message: "",
         status: null,
         to: decodedAccountId,
         type: "banUser",
@@ -370,9 +370,6 @@ export default {
   },
   async contactUs(parent, args, context, info) {
     try {
-
-
-
       await contactUsEmail(context, args, args);
       return null;
     } catch (err) {
