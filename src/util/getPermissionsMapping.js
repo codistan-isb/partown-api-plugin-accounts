@@ -26,6 +26,11 @@ export default function getPermissionsMapping(input) {
       delete: "reaction:legacy:rates/remove",
     },
     // Add more permissions as needed
+    manageFunds: {
+      read: "reaction:legacy:funds/view",
+      edit: "reaction:legacy:funds/edit",
+      delete: "reaction:legacy:funds/remove",
+    },
   };
 
   let permissionsArray = [];

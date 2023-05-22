@@ -438,6 +438,13 @@ export const accountPermissions = new SimpleSchema({
   "managePermissions.$": {
     type: String,
   },
+  manageFunds: {
+    type: Array,
+    optional: true,
+  },
+  "manageFunds.$": {
+    type: String,
+  },
 });
 /**
  * @name Account

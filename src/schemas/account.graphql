@@ -211,6 +211,7 @@ type accountPermissions {
   manageReports: [PermissionsEnum]
   manageRates: [PermissionsEnum]
   managePermissions: [PermissionsEnum]
+  manageFunds: [PermissionsEnum]
 }
 
 type userPreferences {
@@ -642,6 +643,7 @@ input UserPermissions {
   manageReports: [PermissionsEnum]
   manageRates: [PermissionsEnum]
   managePermissions: [PermissionsEnum]
+  manageFunds: [PermissionsEnum]
 }
 
 input contactUsInput {

@@ -16,6 +16,7 @@ const permissions = [
   "manageReports",
   "manageRates",
   "managePermissions",
+  "manageFunds",
 ];
 
 export default async function accounts(context, input) {

@@ -11,6 +11,7 @@ const permissions = [
   "manageReports",
   "manageRates",
   "managePermissions",
+  "manageFunds",
 ];
 
 export default {
