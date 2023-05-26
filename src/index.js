@@ -39,6 +39,9 @@ export default async function register(app) {
           [{ shopId: 1, slug: 1 }],
         ],
       },
+      InvitedUsers: {
+        name: "InvitedUsers",
+      },
       AccountInvites: {
         name: "AccountInvites",
         indexes: [[{ email: 1 }]],
