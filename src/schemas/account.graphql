@@ -655,9 +655,15 @@ input contactUsInput {
   emailMessage: String!
 }
 
+input notificationsDetailsInput {
+  headerMsg: String
+  msgBody: String
+  url: String
+}
+
 extend type Mutation {
   "Invite user"
-  inviteUser(emails: [String!]!): Boolean
+  inviteUser(emails: [String!]!, invitationExpiry: DateTime): Boolean
 
   "Contact the platform owner"
   contactUs(input: contactUsInput): Boolean
@@ -752,6 +758,12 @@ extend type Mutation {
     "Mutation input"
     input: UpdateGroupsForAccountsInput!
   ): UpdateGroupsForAccountsPayload
+
+  "custom notifications based on updates, managed front client-side"
+  sendCustomNotification(
+    accountIds: [ID!]!
+    input: notificationsDetailsInput!
+  ): Boolean
 }
 
 enum accountsFilterEnum {

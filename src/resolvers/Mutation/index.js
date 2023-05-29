@@ -25,6 +25,8 @@ import getPermissionsMapping from "../../util/getPermissionsMapping.js";
 import inviteUserEmail from "../../util/inviteUserEmail.js";
 import ReactionError from "@reactioncommerce/reaction-error";
 import contactUsEmail from "../../util/contactUsEmail.js";
+import sendEmailNotification from "../../util/sendEmailNotification.js";
+import sendPhoneNotification from "../../util/sendPhoneNotification.js";
 export default {
   addAccountAddressBookEntry,
   addAccountEmailRecord,
@@ -351,17 +353,51 @@ export default {
       return err;
     }
   },
-  async inviteUser(parent, { emails }, context, info) {
+  async inviteUser(parent, { emails, invitationExpiry }, context, info) {
     try {
-      const { userId, authToken } = context;
+      const { userId, authToken, collections } = context;
+      const { InvitedUsers } = collections;
+      if (!userId || !authToken) return new Error("Unauthorized");
+
+      await context.validatePermissions("reaction:legacy:accounts", "create");
+
+      let today = new Date();
+      let expiryDate = new Date();
+
+      expiryDate.setDate(today.getDate() + 2);
+
+      expiryDate = expiryDate.toISOString();
+
+      console.log("today is ", today);
+      console.log("new date is ", expiryDate);
 
       const lowerCaseArray = emails.map((item) => item.toLowerCase());
 
-      if (!userId || !authToken) return new Error("Unauthorized");
+      let bulkOperations = lowerCaseArray.map((item) => {
+        return {
+          updateOne: {
+            filter: {
+              email: item,
+            },
+            update: {
+              $set: {
+                email: item,
+                dateSent: today,
+                expirationTime: expiryDate,
+              },
+            },
+            upsert: true,
+          },
+        };
+      });
+
+      const { result } = await InvitedUsers.bulkWrite(bulkOperations);
 
       for (const email of lowerCaseArray) {
         await inviteUserEmail(context, email, userId);
       }
+
+      return result?.ok > 0;
 
       return null;
     } catch (err) {
@@ -372,6 +408,45 @@ export default {
     try {
       await contactUsEmail(context, args, args);
       return null;
+    } catch (err) {
+      return err;
+    }
+  },
+  async sendCustomNotification(parent, args, context, info) {
+    try {
+      const { userId, authToken, collections, mutations } = context;
+      const { Accounts, Shops } = collections;
+
+      const shop = await Shops.findOne({ shopType: "primary" });
+      if (!shop) throw new ReactionError("not-found", "Shop not found");
+
+      const { accountIds } = args;
+      const { headerMsg, msgBody, url } = args.input;
+      accountIds.map(async (item, key) => {
+        let decodedAccountId = decodeOpaqueId(item).id;
+        let account = await Accounts.findOne({
+          _id: decodedAccountId,
+        });
+        console.log("account user preferences", key, account?.userPreferences);
+
+        if (account?.userPreferences?.contactPreferences?.email) {
+          console.log("reaching send email notification function");
+          await sendEmailNotification(
+            account,
+            shop,
+            headerMsg,
+            msgBody,
+            url,
+            context
+          );
+        }
+        if (account?.userPreferences?.contactPreferences?.sms) {
+          await sendPhoneNotification(
+            account?.profile?.phone,
+            `${headerMsg} ${msgBody}`
+          );
+        }
+      });
     } catch (err) {
       return err;
     }
