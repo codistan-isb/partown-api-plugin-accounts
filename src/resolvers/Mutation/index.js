@@ -327,7 +327,6 @@ export default {
       return err;
     }
   },
-
   async updateUserWallet(parent, args, context, info) {
     try {
       let { Accounts } = context.collections;
@@ -451,4 +450,5 @@ export default {
       return err;
     }
   },
+  
 };

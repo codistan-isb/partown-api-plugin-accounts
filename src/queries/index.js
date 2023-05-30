@@ -7,6 +7,7 @@ import groupsByAccount from "./groupsByAccount.js";
 import groupsById from "./groupsById.js";
 import invitations from "./invitations.js";
 import userAccount from "./userAccount.js";
+import invitedUsers from "./invitedUsers.js";
 
 export default {
   accountByUserId,
@@ -17,5 +18,6 @@ export default {
   groupsByAccount,
   groupsById,
   invitations,
-  userAccount
+  userAccount,
+  invitedUsers,
 };

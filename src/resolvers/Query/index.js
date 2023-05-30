@@ -5,6 +5,7 @@ import group from "./group.js";
 import groups from "./groups.js";
 import invitations from "./invitations.js";
 import viewer from "./viewer.js";
+import invitedUsers from "./invitedUsers.js";
 
 export default {
   account,
@@ -13,5 +14,6 @@ export default {
   group,
   groups,
   invitations,
-  viewer
+  viewer,
+  invitedUsers
 };

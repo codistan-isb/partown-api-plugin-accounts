@@ -773,6 +773,42 @@ enum accountsFilterEnum {
   inactive
 }
 
+type InvitedUsers implements Node {
+  _id: ID!
+  email: String
+  dateSent: String
+  expirationTime: String
+}
+
+enum InvitedUserSortByField {
+  dateSent
+  expirationTime
+}
+
+type InvitedUsersEdge implements NodeEdge {
+  "The cursor that represents this node in the paginated results"
+  cursor: ConnectionCursor!
+
+  "Invited Users"
+  node: InvitedUsers
+}
+
+type InvitedUsersConnection {
+  edges: [InvitedUsersEdge]
+
+  """
+  You can request the `nodes` directly to avoid the extra wrapping that `NodeEdge` has,
+  if you know you will not need to paginate the results.
+  """
+  nodes: [InvitedUsers]
+
+  "Information to help a client request the next or previous page"
+  pageInfo: PageInfo!
+
+  "The total number of nodes that match your query"
+  totalCount: Int!
+}
+
 extend type Query {
   "Returns the account with the provided ID"
   account("The account ID" id: ID!): Account
@@ -839,4 +875,31 @@ extend type Query {
 
   "Returns the account for the authenticated user"
   viewer: Account
+
+  "Returns a list of uses that have been invited to the platform by the admin"
+  invitedUsers(
+    "Return account search based on account primary email address, first name or last name"
+    searchQuery: String
+
+    "Return only results that come after this cursor. Use this with `first` to specify the number of results to return."
+    after: ConnectionCursor
+
+    "Return only results that come before this cursor. Use this with `last` to specify the number of results to return."
+    before: ConnectionCursor
+
+    "Return at most this many results. This parameter may be used with either `after` or `offset` parameters."
+    first: ConnectionLimitInt
+
+    "Return at most this many results. This parameter may be used with the `before` parameter."
+    last: ConnectionLimitInt
+
+    "Return only results that come after the Nth result. This parameter may be used with the `first` parameter."
+    offset: Int
+
+    "Return results sorted in this order"
+    sortOrder: SortOrder = asc
+
+    "By default, groups are sorted by when they were created, oldest first. Set this to sort by one of the other allowed fields"
+    sortBy: InvitedUserSortByField = dateSent
+  ): InvitedUsersConnection!
 }
