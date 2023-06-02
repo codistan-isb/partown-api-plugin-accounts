@@ -1,3 +1,4 @@
+import _ from "lodash";
 import addAccountAddressBookEntry from "./addAccountAddressBookEntry.js";
 import addAccountEmailRecord from "./addAccountEmailRecord.js";
 import addAccountToGroup from "./addAccountToGroup.js";
@@ -60,6 +61,81 @@ export default {
         { $set: { identityVerified: true } }
       );
       return result?.n > 0;
+    } catch (err) {
+      return err;
+    }
+  },
+  async rejectUserIdentification(parent, args, context, info) {
+    try {
+      const { userId, authToken, collections } = context;
+      const { Accounts, Shops } = collections;
+      const { accountId, cancellationReason, shopId } = args;
+      const decodedAccountId = decodeOpaqueId(accountId).id;
+
+      if (!userId || !authToken) return new Error("Unauthorized");
+
+      await context.validatePermissions("reaction:legacy:accounts", "create", {
+        shopId,
+      });
+
+      const account = await Accounts.findOne({ _id: decodedAccountId });
+
+      const { result } = await Accounts.updateOne(
+        {
+          _id: decodedAccountId,
+        },
+        {
+          $set: {
+            govId: [],
+            poAddress: [],
+          },
+        }
+      );
+
+      const firstName = _.get(account, "profile.firstName");
+      const lastName = _.get(account, "profile.lastName");
+      const fullName = `${firstName} ${lastName}`;
+
+      const headerMsg = "Your account verification has been rejected";
+
+      const shop = await Shops.findOne({ shopType: "primary" });
+      if (!shop) throw new ReactionError("not-found", "Shop not found");
+
+      let email = _.get(account, "emails[0].address");
+
+      const dataForEmail = {
+        fullName,
+        headerMsg,
+        bodyMsg: cancellationReason,
+        website: "dev.partown.co",
+        email: "dev@partown.co",
+        linkedin: "https://www.linkedin.com",
+      };
+
+      const language =
+        (account.profile && account.profile.language) || shop.language;
+
+      if (result?.n > 0) {
+        context.mutations.createNotification(context, {
+          title: "Verification Rejected",
+          details: cancellationReason,
+          hasDetails: true,
+          message: "",
+          status: null,
+          to: decodedAccountId,
+          type: "banUser",
+        });
+
+        if (account?.userPreferences?.contactPreferences?.email) {
+          context.mutations.sendEmail(context, {
+            data: dataForEmail,
+            fromShop: shop,
+            templateName: "reject/invitation",
+            language,
+            to: email,
+          });
+        }
+      }
     } catch (err) {
       return err;
     }
@@ -383,6 +459,7 @@ export default {
                 email: item,
                 dateSent: today,
                 expirationTime: expiryDate,
+                isRegistered: false,
               },
             },
             upsert: true,
@@ -403,6 +480,22 @@ export default {
       return err;
     }
   },
+  async cancelInvitation(parent, { email }, context, info) {
+    try {
+      const { userId, authToken, collections } = context;
+      const { InvitedUsers } = collections;
+
+      if (!userId || !authToken) return new Error("Unauthorized");
+      await context.validatePermissions("reaction:legacy:accounts", "create");
+      email = email.toLowerCase();
+      const { result } = await InvitedUsers.deleteOne({ email });
+      console.log("result is ", result);
+      return result?.n > 0;
+    } catch (err) {
+      return err;
+    }
+  },
+
   async contactUs(parent, args, context, info) {
     try {
       await contactUsEmail(context, args, args);
@@ -450,5 +543,4 @@ export default {
       return err;
     }
   },
-  
 };

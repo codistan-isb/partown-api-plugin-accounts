@@ -14,7 +14,9 @@ export default async function invitedUsers(context, searchQuery) {
   const { collections } = context;
   const { InvitedUsers } = collections;
   // const { groupIds, notInAnyGroups, searchQuery, filter } = input;
-  let selector = {};
+  let selector = {
+    isRegistered: { $ne: true },
+  };
   if (searchQuery) {
     selector.$or = [
       {
