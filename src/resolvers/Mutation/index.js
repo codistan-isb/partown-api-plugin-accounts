@@ -30,6 +30,8 @@ import sendEmailNotification from "../../util/sendEmailNotification.js";
 import sendPhoneNotification from "../../util/sendPhoneNotification.js";
 import sendPlatformWideNotification from "../../jobs/sendPlatformWideNotification.js";
 import sendPlatformNotification from "../../util/sendPlatformNotification.js";
+import updateAccountEmail from "../../util/updateAccountEmail.js";
+import account from "../Query/account.js";
 export default {
   addAccountAddressBookEntry,
   addAccountEmailRecord,
@@ -602,4 +604,38 @@ export default {
   //     return err;
   //   }
   // },
+  async accountUpdateNotification(parent, { input, accountId }, context, info) {
+    try {
+      const { userId, authToken, collections, mutations, backgroundJobs } =
+        context;
+
+      const { Accounts, Shops, Trades } = collections;
+
+      const shop = await Shops.findOne({ shopType: "primary" });
+      if (!shop) throw new ReactionError("not-found", "Shop not found");
+
+      const decodedAccountId = decodeOpaqueId(accountId).id;
+
+      const adminAccount = await Accounts.findOne({
+        adminUIShopIds: { $ne: null },
+      });
+      const account = await Accounts.findOne({ _id: accountId });
+
+      const email = admin?.emails[0]?.address;
+
+      if (account?.userPreferences?.contactPreferences?.email) {
+        await updateAccountEmail(context, email);
+      }
+
+      if (account?.userPreferences?.contactPreferences?.sms) {
+        console.log("sending phone notification");
+      }
+
+      console.log("admin account is ", adminAccount);
+      console.log("account is ", account);
+      return null;
+    } catch (err) {
+      return err;
+    }
+  },
 };

@@ -777,6 +777,12 @@ extend type Mutation {
     input: notificationsDetailsInput!
     productId: ID!
   ): Boolean
+
+  "notification sent to platform admin when an account owner changes their info"
+  accountUpdateNotification(
+    accountId: ID!
+    input: notificationsDetailsInput
+  ): Boolean
 }
 
 enum accountsFilterEnum {
