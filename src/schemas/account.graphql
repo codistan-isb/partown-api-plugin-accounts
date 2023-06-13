@@ -774,8 +774,8 @@ extend type Mutation {
 
   "custom notifications based on updates, managed front client-side"
   sendCustomNotification(
-    accountIds: [ID!]!
     input: notificationsDetailsInput!
+    productId: ID!
   ): Boolean
 }
 

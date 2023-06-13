@@ -28,6 +28,8 @@ import ReactionError from "@reactioncommerce/reaction-error";
 import contactUsEmail from "../../util/contactUsEmail.js";
 import sendEmailNotification from "../../util/sendEmailNotification.js";
 import sendPhoneNotification from "../../util/sendPhoneNotification.js";
+import sendPlatformWideNotification from "../../jobs/sendPlatformWideNotification.js";
+import sendPlatformNotification from "../../util/sendPlatformNotification.js";
 export default {
   addAccountAddressBookEntry,
   addAccountEmailRecord,
@@ -504,43 +506,100 @@ export default {
       return err;
     }
   },
-  async sendCustomNotification(parent, args, context, info) {
+  async sendCustomNotification(parent, { input, productId }, context, info) {
     try {
-      const { userId, authToken, collections, mutations } = context;
-      const { Accounts, Shops } = collections;
+      const { userId, authToken, collections, mutations, backgroundJobs } =
+        context;
+
+      const { Accounts, Shops, Trades } = collections;
 
       const shop = await Shops.findOne({ shopType: "primary" });
       if (!shop) throw new ReactionError("not-found", "Shop not found");
 
-      const { accountIds } = args;
-      const { headerMsg, msgBody, url } = args.input;
-      accountIds.map(async (item, key) => {
-        let decodedAccountId = decodeOpaqueId(item).id;
-        let account = await Accounts.findOne({
-          _id: decodedAccountId,
-        });
-        console.log("account user preferences", key, account?.userPreferences);
+      const { headerMsg, msgBody, url } = input;
+      const decodedProductId = decodeOpaqueId(productId).id;
+      const trades = await Trades.find({
+        productId: decodedProductId,
+      }).toArray();
 
-        if (account?.userPreferences?.contactPreferences?.email) {
-          console.log("reaching send email notification function");
-          await sendEmailNotification(
-            account,
-            shop,
-            headerMsg,
-            msgBody,
-            url,
-            context
-          );
-        }
-        if (account?.userPreferences?.contactPreferences?.sms) {
-          await sendPhoneNotification(
-            account?.profile?.phone,
-            `${headerMsg} ${msgBody}`
-          );
-        }
+      console.log("trades are ", trades);
+      trades?.map(async (item, key) => {
+        const account = await Accounts.findOne({ _id: item?.createdBy });
+        await sendPlatformNotification(
+          context,
+          account,
+          shop,
+          headerMsg,
+          msgBody,
+          url
+        );
       });
+
+      return null;
+      // const jobData = { shop, accounts, headerMsg, msgBody, url };
+
+      // console.log("running job 1");
+      // const test = await backgroundJobs.scheduleJob({
+      //   type: "platformEmails",
+      //   data: jobData,
+      //   retry: {
+      //     retries: 5,
+      //     wait: 3 * 60000,
+      //   },
+      // });
+
+      // console.log("test is ", test);
+      return null;
     } catch (err) {
       return err;
     }
   },
+  // async trusteeNotifications(parent, args, context, info) {
+  //   try {
+  //     const { userId, authToken, collections, mutations, backgroundJobs } =
+  //       context;
+
+  //     const { Accounts, Shops, Trades } = collections;
+
+  //     const shop = await Shops.findOne({ shopType: "primary" });
+  //     if (!shop) throw new ReactionError("not-found", "Shop not found");
+
+  //     const { headerMsg, msgBody, url } = input;
+  //     const decodedProductId = decodeOpaqueId(productId).id;
+  //     const trades = await Trades.find({
+  //       productId: decodedProductId,
+  //     }).toArray();
+
+  //     console.log("trades are ", trades);
+  //     trades?.map(async (item, key) => {
+  //       const account = await Accounts.findOne({ _id: item?.createdBy });
+  //       await sendPlatformNotification(
+  //         context,
+  //         account,
+  //         shop,
+  //         headerMsg,
+  //         msgBody,
+  //         url
+  //       );
+  //     });
+
+  //     return null;
+  //     // const jobData = { shop, accounts, headerMsg, msgBody, url };
+
+  //     // console.log("running job 1");
+  //     // const test = await backgroundJobs.scheduleJob({
+  //     //   type: "platformEmails",
+  //     //   data: jobData,
+  //     //   retry: {
+  //     //     retries: 5,
+  //     //     wait: 3 * 60000,
+  //     //   },
+  //     // });
+
+  //     // console.log("test is ", test);
+  //     return null;
+  //   } catch (err) {
+  //     return err;
+  //   }
+  // },
 };

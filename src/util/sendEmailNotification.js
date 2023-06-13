@@ -5,13 +5,16 @@ export default async function sendEmailNotification(
   headerMsg,
   msgBody,
   url,
-  context
+  context,
+  bodyTemplate
 ) {
   console.log("reaching send email notification");
 
-  const bodyTemplate = "invite/user";
+  // const bodyTemplate = "invite/user";
 
   let email = _.get(account, "emails[0].address");
+  let firstName = _.get(account, "profile.firstName");
+  let lastName = _.get(account, "profile.lastName");
 
   const emailForTemplate = "dev@partown.co";
 
@@ -20,7 +23,7 @@ export default async function sendEmailNotification(
 
   const dataForEmail = {
     logoImage,
-    userEmail: email,
+    fullName: `${firstName} ${lastName}`,
     headerMsg,
     bodyMsg: msgBody,
     website: "dev@partown.co",
