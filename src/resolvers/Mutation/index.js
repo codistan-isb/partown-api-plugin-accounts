@@ -615,24 +615,28 @@ export default {
       if (!shop) throw new ReactionError("not-found", "Shop not found");
 
       const decodedAccountId = decodeOpaqueId(accountId).id;
+      const { headerMsg, msgBody, url } = input;
 
-      const adminAccount = await Accounts.findOne({
-        adminUIShopIds: { $ne: null },
-      });
-      const account = await Accounts.findOne({ _id: accountId });
+      const account = await Accounts.findOne({ _id: decodedAccountId });
 
-      const email = admin?.emails[0]?.address;
+      const email = account?.emails[0]?.address;
 
       if (account?.userPreferences?.contactPreferences?.email) {
-        await updateAccountEmail(context, email);
+        await updateAccountEmail(context, email, headerMsg, msgBody, url);
       }
-
       if (account?.userPreferences?.contactPreferences?.sms) {
-        console.log("sending phone notification");
+        console.log("sms notification");
       }
+      context.mutations.createNotification(context, {
+        title: headerMsg,
+        details: msgBody,
+        hasDetails: true,
+        message: "",
+        status: null,
+        to: decodedAccountId,
+        type: "banUser",
+      });
 
-      console.log("admin account is ", adminAccount);
-      console.log("account is ", account);
       return null;
     } catch (err) {
       return err;
