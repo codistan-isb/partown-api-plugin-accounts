@@ -1,18 +1,39 @@
 import _ from "lodash";
 import ReactionError from "@reactioncommerce/reaction-error";
 
-export default async function contactUsEmail(context, args, userId) {
+export default async function contactUsEmail(context, args) {
   const {
-    collections: { Shops },
+    collections: { Shops, Accounts },
   } = context;
+
+  console.log("args in email function", args);
+
+  const {
+    firstName,
+    lastName,
+    email,
+    contactNumber,
+    officeAddress,
+    emailMessage,
+  } = args;
 
   const bodyTemplate = "contact/platform";
 
   const shop = await Shops.findOne({ shopType: "primary" });
   if (!shop) throw new ReactionError("not-found", "Shop not found");
 
+  const account = await Accounts.findOne({
+    adminUIShopIds: { $ne: null, $exists: true },
+  });
+  let adminEmail = _.get(account, "emails[0].address");
+
   const dataForEmail = {
-    url: "https://dev.partown.co/en?",
+    firstName,
+    lastName,
+    email: email.toLowerCase(),
+    contactNumber,
+    officeAddress,
+    emailMessage,
   };
 
   const language = shop.language;
@@ -22,6 +43,6 @@ export default async function contactUsEmail(context, args, userId) {
     fromShop: shop,
     templateName: bodyTemplate,
     language,
-    to: "dev@partown.co",
+    to: adminEmail,
   });
 }

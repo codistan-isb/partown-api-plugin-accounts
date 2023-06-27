@@ -377,6 +377,8 @@ type Account implements Node {
 
   "User Date of Birth"
   dob: String
+
+  "User Contact Info"
   contactInfo: contactInfo
 }
 
@@ -669,7 +671,7 @@ extend type Mutation {
   cancelInvitation(email: String!): Boolean
 
   "Contact the platform owner"
-  contactUs(input: contactUsInput): Boolean
+  contactUs(input: contactUsInput, token: String): Boolean
 
   "verify user identification based on id and proof of address"
   verifyUserIdentification(accountId: ID!, shopId: ID!): Boolean

@@ -32,6 +32,13 @@ import sendPlatformWideNotification from "../../jobs/sendPlatformWideNotificatio
 import sendPlatformNotification from "../../util/sendPlatformNotification.js";
 import updateAccountEmail from "../../util/updateAccountEmail.js";
 import account from "../Query/account.js";
+
+// const Recaptcha = require("google-recaptcha");
+import Recaptcha from "google-recaptcha";
+const recaptcha = new Recaptcha({
+  secret: "6LdjCrcmAAAAAGWZSNqVxEKnqALklnOQPLPLkrH7",
+});
+
 export default {
   addAccountAddressBookEntry,
   addAccountEmailRecord,
@@ -500,9 +507,15 @@ export default {
     }
   },
 
-  async contactUs(parent, args, context, info) {
+  async contactUs(parent, { input, token }, context, info) {
     try {
-      await contactUsEmail(context, args, args);
+      const result = await recaptcha.verify(token);
+
+      if (!result.success) {
+        throw new Error("reCAPTCHA verification failed.");
+      }
+
+      await contactUsEmail(context, input);
       return null;
     } catch (err) {
       return err;
