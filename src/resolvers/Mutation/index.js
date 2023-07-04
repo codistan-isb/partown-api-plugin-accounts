@@ -445,7 +445,7 @@ export default {
       const { InvitedUsers } = collections;
       if (!userId || !authToken) return new Error("Unauthorized");
 
-      await context.validatePermissions("reaction:legacy:accounts", "create");
+      // await context.validatePermissions("reaction:legacy:accounts", "create");
 
       let today = new Date();
       let expiryDate = new Date();
@@ -474,7 +474,7 @@ export default {
               },
             },
             upsert: true,
-          },
+          },  
         };
       });
 
@@ -485,8 +485,6 @@ export default {
       }
 
       return result?.ok > 0;
-
-      return null;
     } catch (err) {
       return err;
     }
