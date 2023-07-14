@@ -4,7 +4,7 @@ import ReactionError from "@reactioncommerce/reaction-error";
 
 const inputSchema = new SimpleSchema({
   email: String,
-  url: String
+  url: String,
 });
 
 /**
@@ -19,7 +19,7 @@ const inputSchema = new SimpleSchema({
  */
 async function sendResetEmail(context, account, email, url) {
   const {
-    collections: { Shops }
+    collections: { Shops },
   } = context;
 
   // Account emails are always sent from the primary shop email and using primary shop
@@ -35,14 +35,17 @@ async function sendResetEmail(context, account, email, url) {
     copyrightDate: new Date().getFullYear(),
     legalName: _.get(shop, "addressBook[0].company"),
     physicalAddress: {
-      address: `${_.get(shop, "addressBook[0].address1")} ${_.get(shop, "addressBook[0].address2")}`,
+      address: `${_.get(shop, "addressBook[0].address1")} ${_.get(
+        shop,
+        "addressBook[0].address2"
+      )}`,
       city: _.get(shop, "addressBook[0].city"),
       region: _.get(shop, "addressBook[0].region"),
-      postal: _.get(shop, "addressBook[0].postal")
+      postal: _.get(shop, "addressBook[0].postal"),
     },
     shopName: shop.name,
     // Account Data
-    passwordResetUrl: url
+    passwordResetUrl: url,
   };
 
   // get account profile language for email
@@ -53,7 +56,7 @@ async function sendResetEmail(context, account, email, url) {
     fromShop: shop,
     language,
     templateName: "accounts/resetPassword",
-    to: email
+    to: email,
   });
 }
 
@@ -68,16 +71,17 @@ async function sendResetEmail(context, account, email, url) {
  */
 export default async function sendResetAccountPasswordEmail(context, input) {
   inputSchema.validate(input);
+
+  console.log("input is ", input);
   const { collections } = context;
   const { Accounts } = collections;
-  const {
-    email,
-    url
-  } = input;
+  const { email, url } = input;
 
   const caseInsensitiveEmail = email.toLowerCase();
 
-  const account = await Accounts.findOne({ "emails.address": caseInsensitiveEmail });
+  const account = await Accounts.findOne({
+    "emails.address": caseInsensitiveEmail,
+  });
   if (!account) throw new ReactionError("not-found", "Account not found");
 
   await sendResetEmail(context, account, caseInsensitiveEmail, url);

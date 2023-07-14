@@ -33,6 +33,8 @@ import sendPlatformNotification from "../../util/sendPlatformNotification.js";
 import updateAccountEmail from "../../util/updateAccountEmail.js";
 import account from "../Query/account.js";
 
+import Random from "@reactioncommerce/random";
+
 // const Recaptcha = require("google-recaptcha");
 import Recaptcha from "google-recaptcha";
 const recaptcha = new Recaptcha({
@@ -333,7 +335,7 @@ export default {
       );
 
       if (!check1) {
-        let random = generateRandomString();
+        let random = generateRandomString(6);
         const { group } = await context.mutations.createAccountGroup(
           context.getInternalContext(),
           {
@@ -376,7 +378,7 @@ export default {
       };
 
       if (!check2) {
-        const random2 = generateRandomString();
+        const random2 = generateRandomString(6);
         // Create a new group with additional permissions if needed
 
         const { group: additionalGroup } =
@@ -454,12 +456,10 @@ export default {
 
       expiryDate = expiryDate.toISOString();
 
-      console.log("today is ", today);
-      console.log("new date is ", expiryDate);
-
       const lowerCaseArray = emails.map((item) => item.toLowerCase());
-
-      let bulkOperations = lowerCaseArray.map((item) => {
+      let registerToken = [];
+      let bulkOperations = lowerCaseArray.map((item, key) => {
+        registerToken[key] = generateRandomString(32);
         return {
           updateOne: {
             filter: {
@@ -471,18 +471,21 @@ export default {
                 dateSent: today,
                 expirationTime: expiryDate,
                 isRegistered: false,
+                registerToken: registerToken[key],
+                invitedBy: userId,
               },
             },
             upsert: true,
-          },  
+          },
         };
       });
 
+      console.log("register url is ", registerToken);
       const { result } = await InvitedUsers.bulkWrite(bulkOperations);
 
-      for (const email of lowerCaseArray) {
-        await inviteUserEmail(context, email, userId);
-      }
+      lowerCaseArray.forEach(async (email, index) => {
+        await inviteUserEmail(context, email, registerToken[index]);
+      });
 
       return result?.ok > 0;
     } catch (err) {
