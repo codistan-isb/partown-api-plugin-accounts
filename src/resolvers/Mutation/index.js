@@ -527,19 +527,35 @@ export default {
       const { userId, authToken, collections, mutations, backgroundJobs } =
         context;
 
-      const { Accounts, Shops, Trades } = collections;
+      const { Accounts, Shops, Trades, Catalog } = collections;
 
       const shop = await Shops.findOne({ shopType: "primary" });
       if (!shop) throw new ReactionError("not-found", "Shop not found");
 
       const { headerMsg, msgBody, url } = input;
       const decodedProductId = decodeOpaqueId(productId).id;
+      const { product } = await Catalog.findOne({
+        "product._id": decodedProductId,
+      });
+      const decodedManagerId = decodeOpaqueId(product?.manager).id;
+      await sendPlatformNotification(
+        context,
+        account,
+        shop,
+        headerMsg,
+        msgBody,
+        url
+      );
+      console.log("product manager is ", decodedManagerId);
+
       const trades = await Trades.find({
         productId: decodedProductId,
       }).toArray();
 
-      console.log("trades are ", trades);
+      trades.push({ createdBy: decodedManagerId });
+
       trades?.map(async (item, key) => {
+        console.log("item is ", item);
         const account = await Accounts.findOne({ _id: item?.createdBy });
         await sendPlatformNotification(
           context,
