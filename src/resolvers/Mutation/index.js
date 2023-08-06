@@ -35,11 +35,11 @@ import account from "../Query/account.js";
 
 import Random from "@reactioncommerce/random";
 
-// const Recaptcha = require("google-recaptcha");
-import Recaptcha from "google-recaptcha";
-const recaptcha = new Recaptcha({
-  secret: "6LdjCrcmAAAAAGWZSNqVxEKnqALklnOQPLPLkrH7",
-});
+// // const Recaptcha = require("google-recaptcha");
+// import Recaptcha from "google-recaptcha";
+// const recaptcha = new Recaptcha({
+//   secret: "6LdjCrcmAAAAAGWZSNqVxEKnqALklnOQPLPLkrH7",
+// });
 
 export default {
   addAccountAddressBookEntry,
@@ -510,11 +510,11 @@ export default {
 
   async contactUs(parent, { input, token }, context, info) {
     try {
-      const result = await recaptcha.verify(token);
+      // const result = await recaptcha.verify(token);
 
-      if (!result.success) {
-        throw new Error("reCAPTCHA verification failed.");
-      }
+      // if (!result.success) {
+      //   throw new Error("reCAPTCHA verification failed.");
+      // }
 
       await contactUsEmail(context, input);
       return null;
