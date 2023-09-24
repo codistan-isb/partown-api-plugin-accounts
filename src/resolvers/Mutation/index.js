@@ -328,7 +328,19 @@ export default {
         shopId: decodedShopId,
       });
 
+      //throw an error if the super user permissions are changed
+
       const decodedAccountId = decodeOpaqueId(accountId).id;
+
+      const { _id: superAdminId } = await Accounts.findOne({
+        adminUIShopIds: { $ne: null },
+      });
+
+      if (superAdminId === decodedAccountId)
+        return new Error(
+          "Access Denied, cannot update super admin permissions"
+        );
+
       const { check1, check2 } = await checkUserPermissionsGroup(
         context,
         decodedAccountId
@@ -444,10 +456,14 @@ export default {
   async inviteUser(parent, { emails, invitationExpiry }, context, info) {
     try {
       const { userId, authToken, collections } = context;
-      const { InvitedUsers } = collections;
+      const { Accounts, InvitedUsers } = collections;
       if (!userId || !authToken) return new Error("Unauthorized");
 
       // await context.validatePermissions("reaction:legacy:accounts", "create");
+
+      const account = await Accounts.findOne({ _id: userId });
+
+      const senderName = account?.profile?.firstName;
 
       let today = new Date();
       let expiryDate = new Date();
@@ -480,11 +496,10 @@ export default {
         };
       });
 
-      console.log("register url is ", registerToken);
       const { result } = await InvitedUsers.bulkWrite(bulkOperations);
 
       lowerCaseArray.forEach(async (email, index) => {
-        await inviteUserEmail(context, email, registerToken[index]);
+        await inviteUserEmail(context, email, registerToken[index], senderName);
       });
 
       return result?.ok > 0;

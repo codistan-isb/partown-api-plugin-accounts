@@ -4,7 +4,8 @@ import ReactionError from "@reactioncommerce/reaction-error";
 export default async function inviteUserEmail(
   context,
   recipientEmail,
-  registerToken
+  registerToken,
+  senderName
 ) {
   const {
     collections: { Accounts, Shops },
@@ -12,28 +13,19 @@ export default async function inviteUserEmail(
 
   const bodyTemplate = "invite/user";
 
-  const registerUrl = `${process.env.CLIENT_URL}registerToken=${registerToken}`;
+  const registerUrl = `${process.env.CLIENT_URL}?registerToken=${registerToken}`;
 
   const shop = await Shops.findOne({ shopType: "primary" });
   if (!shop) throw new ReactionError("not-found", "Shop not found");
+  const currentYear = new Date().getFullYear();
 
-  // let email = _.get(account, "emails[0].address");
-  const headerMsg = "You are invited to partOwn";
-  const bodyMsg = "Follow the link to complete your registration";
-  const website = "https://dev.partown.co/en?";
-  const emailForTemplate = "dev@partown.co";
-  const linkedIn = "https://www.linkedin.com/";
-  const logoImage = "https://i.imgur.com/xgJX3WK.jpeg";
   const dataForEmail = {
-    logoImage,
-    userEmail: recipientEmail,
-    headerMsg,
-    bodyMsg,
-    website,
-    email: emailForTemplate,
-    linkedIn,
+    name: senderName,
     registerUrl,
-    // url: "https://dev.partown.co/en?",
+    facebook: process.env.FACEBOOK,
+    twitter: process.env.TWITTER,
+    instagram: process.env.INSTAGRAM,
+    currentYear,
   };
 
   const language = shop.language;
