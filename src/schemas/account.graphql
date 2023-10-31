@@ -664,6 +664,9 @@ input notificationsDetailsInput {
 }
 
 extend type Mutation {
+  "update admin permissions"
+  updateSuperAdminPermissions: Boolean
+
   "Invite user"
   inviteUser(emails: [String!]!, invitationExpiry: DateTime): Boolean
 

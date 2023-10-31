@@ -34,6 +34,7 @@ import updateAccountEmail from "../../util/updateAccountEmail.js";
 import account from "../Query/account.js";
 
 import Random from "@reactioncommerce/random";
+import updateSuperAdminPermissions from "./updateSuperAdminPermissions.js";
 
 // // const Recaptcha = require("google-recaptcha");
 // import Recaptcha from "google-recaptcha";
@@ -42,6 +43,7 @@ import Random from "@reactioncommerce/random";
 // });
 
 export default {
+  updateSuperAdminPermissions,
   addAccountAddressBookEntry,
   addAccountEmailRecord,
   addAccountToGroup,
