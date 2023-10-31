@@ -1,6 +1,12 @@
 export default async function updateSuperAdminPermissions(context) {
   const { Accounts } = context.collections;
 
+  const superAdminAccount = Accounts.fineOne({
+    adminUIShopIds: { $ne: null, $exists: true, $not: { $size: 0 } },
+  });
+
+  if (!superAdminAccount) return;
+
   await Accounts.findOneAndUpdate(
     {
       adminUIShopIds: { $ne: null, $exists: true, $not: { $size: 0 } },
