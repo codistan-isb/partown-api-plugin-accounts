@@ -10,7 +10,8 @@ import extendAccountSchema from "./preStartup/extendAccountSchema.js";
 import checkDatabaseVersion from "./preStartup/checkDatabaseVersion.js";
 import accountByUserId from "./util/accountByUserId.js";
 import { Account, Group, Profile } from "./simpleSchemas.js";
-import platformEmailSMTPStartup from "./startup/platformEmailSMTPStartup.js"
+import platformEmailSMTPStartup from "./startup/platformEmailSMTPStartup.js";
+import updateSuperAdminPermissions from "./startup/updateSuperAdminPermissions.js";
 
 /**
  * @summary Import and call this function to add this plugin to your API.
@@ -25,7 +26,11 @@ export default async function register(app) {
     version: pkg.version,
     functionsByType: {
       preStartup: [extendAccountSchema, checkDatabaseVersion],
-      startup: [afterShopCreate, platformEmailSMTPStartup],
+      startup: [
+        afterShopCreate,
+        platformEmailSMTPStartup,
+        updateSuperAdminPermissions,
+      ],
     },
     i18n,
 
