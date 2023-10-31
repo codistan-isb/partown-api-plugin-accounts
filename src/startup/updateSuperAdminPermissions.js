@@ -1,3 +1,5 @@
+import ReactionError from "@reactioncommerce/reaction-error";
+
 export default async function updateSuperAdminPermissions(context) {
   const { Accounts } = context.collections;
 
@@ -7,7 +9,8 @@ export default async function updateSuperAdminPermissions(context) {
     adminUIShopIds: { $ne: null, $exists: true, $not: { $size: 0 } },
   });
 
-  if (!superAdminAccount) return;
+  if (!superAdminAccount)
+    throw new ReactionError("not-found", "Admin Account not found");
 
   console.log("super admin account is ", superAdminAccount);
 
