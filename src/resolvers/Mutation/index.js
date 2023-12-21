@@ -318,22 +318,22 @@ export default {
     try {
       const { authToken, userId, collections } = context;
       const { Accounts } = collections;
-      const { accountId, shopId, input } = args;
-      const decodedShopId = decodeOpaqueId(shopId).id;
+      const { accountId, shopId, input, accountInput } = args;
 
-      let { permissionsArray, additionalPermissionsArray } =
-        getPermissionsMapping(input); // Destructure the result of getPermissionsMapping into two variables
+      console.log("input is ", input);
 
+      //validate if the user is logged in
       if (!authToken || !userId) return new Error("Unauthorized");
 
+      //validate if the user has permission to update permissions
+      const decodedShopId = decodeOpaqueId(shopId).id;
       await context.validatePermissions("reaction:legacy:groups", "update", {
         shopId: decodedShopId,
       });
 
-      //throw an error if the super user permissions are changed
-
       const decodedAccountId = decodeOpaqueId(accountId).id;
 
+      //throw an error if the super user permissions are changed
       const { _id: superAdminId } = await Accounts.findOne({
         adminUIShopIds: { $ne: null },
       });
@@ -343,10 +343,46 @@ export default {
           "Access Denied, cannot update super admin permissions"
         );
 
+      let accountFields = { accountPermissions: input };
+      if (accountInput && Object.keys(accountInput).length > 0) {
+        if (accountInput?.firstName) {
+          accountFields["profile.firstName"] = accountInput?.firstName;
+        }
+
+        if (accountInput?.lastName) {
+          accountFields["profile.lastName"] = accountInput?.lastName;
+        }
+
+        if (accountInput?.lastName) {
+          accountFields["profile.firstName"] = accountInput?.firstName;
+        }
+
+        if (accountInput?.email) {
+          accountFields["contactInfo.email"] = accountInput?.email;
+        }
+
+        if (accountInput?.phone) {
+          accountFields["contactInfo.phone"] = accountInput?.phone;
+        }
+
+        if (accountInput?.picture) {
+          accountFields["profile.picture"] = accountInput?.picture;
+        }
+
+        // await Accounts.update({ _id: accountId }, { $set: accountInput });
+      }
+
+      let { permissionsArray, additionalPermissionsArray } =
+        getPermissionsMapping(input); // Destructure the result of getPermissionsMapping into two variables
+
+      console.log({ permissionsArray, additionalPermissionsArray });
+
       const { check1, check2 } = await checkUserPermissionsGroup(
         context,
         decodedAccountId
       );
+
+      console.log({ check1, check2 });
 
       if (!check1) {
         let random = generateRandomString(6);
@@ -362,13 +398,48 @@ export default {
           }
         );
 
-        await Accounts.update(
-          {
-            _id: decodedAccountId,
-          },
-          { $set: { groups: [group?._id], accountPermissions: input } }
-        );
+        accountFields["groups"] = [group?._id];
+        accountFields["accountPermissions"] = input;
+
+        console.log("accountFields are  ", accountFields);
+
+        // await Accounts.update(
+        //   {
+        //     _id: decodedAccountId,
+        //   },
+        //   { $set: { groups: [group?._id], accountPermissions: input } }
+        // );
       }
+
+      if (!check2) {
+        const random2 = generateRandomString(6);
+        // Create a new group with additional permissions if needed
+
+        const { group: additionalGroup } =
+          await context.mutations.createAccountGroup(
+            context.getInternalContext(),
+            {
+              group: {
+                name: `users-${random2}`,
+                slug: `users-${random2}`,
+                permissions: additionalPermissionsArray,
+              },
+              createdBy: userId,
+            }
+          );
+
+        accountFields;
+
+        accountFields.groups.push(additionalGroup?._id);
+        // await Accounts.update(
+        //   {
+        //     _id: decodedAccountId,
+        //   },
+        //   { $push: { groups: additionalGroup?._id } }
+        // );
+      }
+
+      await Accounts.update({ _id: decodedAccountId }, { $set: accountFields });
 
       let groupId = await getAccountGroup(context, decodedAccountId);
 
@@ -391,39 +462,11 @@ export default {
         },
       };
 
-      if (!check2) {
-        const random2 = generateRandomString(6);
-        // Create a new group with additional permissions if needed
-
-        const { group: additionalGroup } =
-          await context.mutations.createAccountGroup(
-            context.getInternalContext(),
-            {
-              group: {
-                name: `users-${random2}`,
-                slug: `users-${random2}`,
-                permissions: additionalPermissionsArray,
-              },
-              createdBy: userId,
-            }
-          );
-        await Accounts.update(
-          {
-            _id: decodedAccountId,
-          },
-          { $push: { groups: additionalGroup?._id } }
-        );
-      }
-
       await context.mutations.updateAccountGroup(context, {
         ...additionalGroupInput,
         groupId: groupId[1],
       });
 
-      await Accounts.update(
-        { _id: decodedAccountId },
-        { $set: { accountPermissions: input } }
-      );
       return true;
     } catch (err) {
       console.log("update user permissions error");
@@ -501,7 +544,14 @@ export default {
       const { result } = await InvitedUsers.bulkWrite(bulkOperations);
 
       lowerCaseArray.forEach(async (email, index) => {
-        await inviteUserEmail(context, email, registerToken[index], senderName);
+        let test = await inviteUserEmail(
+          context,
+          email,
+          registerToken[index],
+          senderName
+        );
+
+        console.log("test ", test);
       });
 
       return result?.ok > 0;

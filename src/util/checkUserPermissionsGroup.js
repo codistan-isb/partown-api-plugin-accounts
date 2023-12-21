@@ -1,6 +1,14 @@
 export default async function checkUserPermissionsGroup(context, userId) {
   const { Accounts, Groups } = context.collections;
-  let { groups } = await Accounts.findOne({ userId });
+  let accountGroup = await Accounts.findOne({ userId });
+  const groups = accountGroup?.groups;
+
+  if (!groups || groups?.length === 0) {
+    return {
+      check1: false,
+      check2: false,
+    };
+  }
 
   let group1 = await Groups.findOne({ _id: groups[0] });
   let group2 = await Groups.findOne({ _id: groups[1] });

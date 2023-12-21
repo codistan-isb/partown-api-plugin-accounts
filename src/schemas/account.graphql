@@ -663,6 +663,14 @@ input notificationsDetailsInput {
   url: String
 }
 
+input AccountInputPermissions {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  picture: String
+}
+
 extend type Mutation {
   "update admin permissions"
   updateSuperAdminPermissions: Boolean
@@ -709,6 +717,7 @@ extend type Mutation {
     accountId: ID!
     shopId: ID!
     input: UserPermissions
+    accountInput: AccountInputPermissions
   ): Boolean
 
   "add suspension status for a user"
@@ -842,6 +851,9 @@ extend type Query {
   accounts(
     "filter all, pending verification and banned users"
     filter: accountsFilterEnum
+
+    "admin filter"
+    adminFilter: Boolean
 
     "Return only accounts in any of these groups"
     groupIds: [ID]
