@@ -393,6 +393,10 @@ enum KinRelation {
   Father
   Brother
   Sister
+  Partner
+  Spouse
+  Husband
+  Wife
 }
 
 type contactPreferences {
