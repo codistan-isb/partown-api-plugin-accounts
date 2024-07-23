@@ -19,6 +19,7 @@ import platformEmailSMTPStartup from "./startup/platformEmailSMTPStartup.js";
  */
 
 export default async function register(app) {
+  console.log("Partown Accounts Plugin")
   await app.registerPlugin({
     label: "Accounts",
     name: "accounts",

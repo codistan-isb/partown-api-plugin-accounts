@@ -510,6 +510,7 @@ export default {
 
       const senderName = account?.profile?.firstName;
 
+      
       let today = new Date();
       let expiryDate = new Date();
 
@@ -518,8 +519,19 @@ export default {
       expiryDate = expiryDate.toISOString();
 
       const lowerCaseArray = emails.map((item) => item.toLowerCase());
+      const alreadyExistingUsers = await Accounts.find({
+        "emails.address": {
+          $in: lowerCaseArray
+        }
+      }).toArray()
+
+      const usersToBeInvited = lowerCaseArray?.filter?.(email => !alreadyExistingUsers?.some?.((user) => user?.emails?.some((userEmail) => userEmail.address === email )))
+
+      console.log("usersToBeInvited", usersToBeInvited)
+      if(!usersToBeInvited?.length) return new Error("All these Users are already invited.");
+
       let registerToken = [];
-      let bulkOperations = lowerCaseArray.map((item, key) => {
+      let bulkOperations = usersToBeInvited.map((item, key) => {
         registerToken[key] = generateRandomString(32);
         return {
           updateOne: {
@@ -543,7 +555,7 @@ export default {
 
       const { result } = await InvitedUsers.bulkWrite(bulkOperations);
 
-      lowerCaseArray.forEach(async (email, index) => {
+      usersToBeInvited.forEach(async (email, index) => {
         let test = await inviteUserEmail(
           context,
           email,
